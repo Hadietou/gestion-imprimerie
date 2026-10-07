@@ -83,6 +83,14 @@ npm run lint
 Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL et la clé `anon`
 (Supabase > Project Settings > API). Sur Cloudflare Pages, définir les mêmes variables dans les paramètres du projet.
 
+## Déploiement
+
+- Dépôt GitHub : https://github.com/Hadietou/gestion-imprimerie (branche `main`)
+- Production : https://gestion-imprimerie.pages.dev — Cloudflare Pages redéploie à chaque `git push` sur `main`
+- Projet Supabase : `pjoghzbheeweseerfztw`
+- Variables Cloudflare (Settings > Variables) : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (clé publishable `sb_publishable_…`),
+  `NODE_VERSION=22`. Elles sont intégrées au build : après modification, relancer un déploiement.
+
 ## Avancement
 
 - [x] Étape 1 : projet, connexion Supabase, page de connexion, navigation selon le rôle
