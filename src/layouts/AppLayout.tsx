@@ -10,7 +10,10 @@ export default function AppLayout() {
 
   if (!profil) return null
   const entrees = menuPourRole(profil.role)
-  const titre = MENU.find((e) => location.pathname.startsWith(e.chemin))?.libelle ?? ''
+  const titre =
+    location.pathname === '/mon-compte'
+      ? 'Mon compte'
+      : (MENU.find((e) => location.pathname.startsWith(e.chemin))?.libelle ?? '')
 
   return (
     <div className={`app ${menuOuvert ? 'menu-ouvert' : ''}`}>
@@ -32,6 +35,9 @@ export default function AppLayout() {
             <strong>{profil.nom_complet || 'Utilisateur'}</strong>
             <span className={`badge-role role-${profil.role}`}>{LIBELLES_ROLES[profil.role]}</span>
           </div>
+          <NavLink to="/mon-compte" className="bouton bouton-discret" onClick={() => setMenuOuvert(false)}>
+            Mon compte
+          </NavLink>
           <button className="bouton bouton-discret" onClick={deconnexion}>
             Se déconnecter
           </button>

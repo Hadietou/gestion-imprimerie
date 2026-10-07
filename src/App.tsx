@@ -9,10 +9,13 @@ import Connexion from './pages/Connexion'
 import CompteInactif from './pages/CompteInactif'
 import TableauDeBord from './pages/TableauDeBord'
 import EnConstruction from './pages/EnConstruction'
+import Utilisateurs from './pages/Utilisateurs'
+import MonCompte from './pages/MonCompte'
 
 // Pages réelles par chemin ; les autres entrées du MENU affichent « en construction »
 const PAGES: Record<string, ReactNode> = {
   '/tableau-de-bord': <TableauDeBord />,
+  '/utilisateurs': <Utilisateurs />,
 }
 
 function RedirectionAccueil() {
@@ -35,6 +38,8 @@ export default function App() {
                   <Route path={`${e.chemin}/*`} element={PAGES[e.chemin] ?? <EnConstruction module={e.libelle} />} />
                 </Route>
               ))}
+              {/* Accessible à tous les rôles, hors menu principal */}
+              <Route path="/mon-compte" element={<MonCompte />} />
               <Route path="*" element={<RedirectionAccueil />} />
             </Route>
           </Route>

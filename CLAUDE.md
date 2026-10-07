@@ -16,14 +16,20 @@ Toute l'interface, les messages et le code métier (noms de variables, composant
 
 ## Base de données
 
-- Source de vérité : [imprimerie_schema.sql](imprimerie_schema.sql) — **à relire avant toute fonctionnalité touchant aux données.**
-  Le script est rejouable dans Supabase > SQL Editor.
+- Source de vérité : [imprimerie_schema.sql](imprimerie_schema.sql) puis les compléments `sql/NN_*.sql`, exécutés dans l'ordre
+  — **à relire avant toute fonctionnalité touchant aux données.** Scripts rejouables dans Supabase > SQL Editor.
+  Toute évolution de la base = un nouveau fichier `sql/NN_*.sql` rejouable (ne pas modifier un script déjà exécuté).
+  - `sql/02_utilisateurs.sql` : fonction `liste_utilisateurs()` (e-mails, réservée au gérant), garde-fou « au moins un gérant actif ».
 - Beaucoup de logique est **côté base** ; ne pas la refaire côté client :
   numérotation `DEV-/CMD-/FAC-AAAA-0001`, TVA par défaut, totaux des devis, stock via `mouvements_stock`,
   `montant_paye` et statut des factures via `paiements`, création auto du profil à l'inscription.
 - **Sécurité = RLS** (section 10 du schéma). Le client utilise uniquement la clé `anon` publique ;
   ne jamais mettre la clé `service_role` dans le front.
 - Un nouveau compte a `profils.actif = false` : il doit être activé par le gérant.
+- Opérations nécessitant la clé `service_role` (création de compte, réinitialisation de mot de passe) :
+  **Edge Function** [supabase/functions/gerer-utilisateurs](supabase/functions/gerer-utilisateurs/index.ts),
+  qui vérifie elle-même que l'appelant est un gérant actif. Déployée avec « Verify JWT » désactivé (vérification faite dans le code).
+  Après modification du fichier, la redéployer (éditeur Supabase ou `npx supabase functions deploy gerer-utilisateurs`).
 - Types TS : écrits à la main dans `src/lib/types.ts` pour l'instant ;
   à terme, générer avec `npx supabase gen types typescript --project-id <id>`.
 
@@ -53,14 +59,21 @@ Le masquage dans le menu et `RouteRole` sont du confort d'interface : la vraie p
 src/
   lib/supabase.ts       client Supabase unique (variables VITE_SUPABASE_*)
   lib/types.ts          types alignés sur le schéma SQL
+  lib/utilisateurs.ts   accès aux données utilisateurs (RPC + Edge Function)
+  components/           Chargement, Fenetre (modale <dialog>)
   auth/AuthProvider.tsx session + profil (table profils), connexion / déconnexion
   auth/AuthContext.ts   contexte + hook useAuth()
   auth/Protection.tsx   RouteConnectee (session + profil actif), RouteRole (rôles)
   auth/roles.ts         menu et droits par rôle
   layouts/AppLayout.tsx barre latérale (tiroir sur mobile) + en-tête
-  pages/                Connexion, CompteInactif, TableauDeBord, EnConstruction (modules à venir)
+  pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte,
+                        EnConstruction (modules à venir)
   styles.css            CSS simple avec variables (thème clair/sombre), pas de framework CSS
+sql/                    compléments au schéma, numérotés
+supabase/functions/     Edge Functions (Deno)
 ```
+
+`/mon-compte` (changer son mot de passe) est accessible à tous les rôles, hors `MENU`, via le bloc utilisateur de la barre latérale.
 
 Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES` de `src/App.tsx`
 (la route et le contrôle de rôle sont générés à partir de `MENU`).
@@ -94,6 +107,7 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 ## Avancement
 
 - [x] Étape 1 : projet, connexion Supabase, page de connexion, navigation selon le rôle
+- [x] Étape 2 : gestion des utilisateurs (création, activation, rôle, mot de passe) + « Mon compte »
+- [ ] Paramètres, Machines & tarifs (machines, supports, finitions)
 - [ ] Modules métier (clients, devis avec calcul de prix, commandes/BAT, production, factures, stock…)
-- [ ] Gestion des utilisateurs par le gérant (activation, rôle)
 - [ ] PWA, puis Android (Capacitor)

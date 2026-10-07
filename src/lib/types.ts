@@ -11,3 +11,14 @@ export interface Profil {
   created_at: string
   updated_at: string
 }
+
+// Ligne renvoyée par la fonction SQL liste_utilisateurs() (sql/02_utilisateurs.sql)
+export interface Utilisateur {
+  id: string
+  email: string
+  nom_complet: string
+  role: Role
+  actif: boolean
+  created_at: string
+  derniere_connexion: string | null
+}
