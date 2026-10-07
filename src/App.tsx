@@ -11,11 +11,14 @@ import TableauDeBord from './pages/TableauDeBord'
 import EnConstruction from './pages/EnConstruction'
 import Utilisateurs from './pages/Utilisateurs'
 import MonCompte from './pages/MonCompte'
+import Parametres from './pages/Parametres'
+import { ParametresProvider } from './parametres/ParametresProvider'
 
 // Pages réelles par chemin ; les autres entrées du MENU affichent « en construction »
 const PAGES: Record<string, ReactNode> = {
   '/tableau-de-bord': <TableauDeBord />,
   '/utilisateurs': <Utilisateurs />,
+  '/parametres': <Parametres />,
 }
 
 function RedirectionAccueil() {
@@ -32,7 +35,13 @@ export default function App() {
           <Route path="/compte-inactif" element={<CompteInactif />} />
 
           <Route element={<RouteConnectee />}>
-            <Route element={<AppLayout />}>
+            <Route
+              element={
+                <ParametresProvider>
+                  <AppLayout />
+                </ParametresProvider>
+              }
+            >
               {MENU.map((e) => (
                 <Route key={e.chemin} element={<RouteRole roles={e.roles} />}>
                   <Route path={`${e.chemin}/*`} element={PAGES[e.chemin] ?? <EnConstruction module={e.libelle} />} />

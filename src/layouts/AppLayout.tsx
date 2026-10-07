@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { LIBELLES_ROLES, MENU, menuPourRole } from '../auth/roles'
+import { useParametres } from '../parametres/ParametresContext'
 
 export default function AppLayout() {
   const { profil, deconnexion } = useAuth()
+  const { parametres } = useParametres()
   const location = useLocation()
   const [menuOuvert, setMenuOuvert] = useState(false)
 
@@ -20,7 +22,7 @@ export default function AppLayout() {
       <aside className="barre-laterale" aria-label="Navigation principale">
         <div className="marque">
           <img src="/favicon.svg" alt="" width={32} height={32} />
-          <span>Imprimerie</span>
+          <span>{parametres?.nom_imprimerie || 'Imprimerie'}</span>
         </div>
         <nav>
           {entrees.map((e) => (

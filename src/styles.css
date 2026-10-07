@@ -63,7 +63,7 @@ a.bouton { text-decoration: none; display: inline-flex; align-items: center; }
 .bouton-discret { border-color: transparent; background: transparent; color: var(--texte-doux); padding: 0.4rem 0; min-height: 0; text-align: left; }
 .bouton-discret:hover { color: var(--texte); }
 
-input {
+input, textarea {
   font: inherit;
   width: 100%;
   padding: 0.65rem 0.75rem;
@@ -73,7 +73,9 @@ input {
   color: var(--texte);
   min-height: 44px;
 }
-input:focus-visible, .bouton:focus-visible, a:focus-visible {
+textarea { resize: vertical; }
+input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--erreur); }
+input:focus-visible, textarea:focus-visible, .bouton:focus-visible, a:focus-visible {
   outline: 2px solid var(--primaire);
   outline-offset: 2px;
 }
@@ -331,6 +333,35 @@ input:focus-visible, .bouton:focus-visible, a:focus-visible {
 .identifiants dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 .mot-de-passe { font-family: ui-monospace, Consolas, monospace; font-size: 1.15rem; letter-spacing: 0.05em; }
 
+/* ---------- Page Paramètres ---------- */
+.page-parametres { max-width: 900px; }
+.titre-carte { font-size: 1.05rem; margin: 0; }
+.grille-champs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+  margin-top: 1rem;
+}
+.grille-champs .champ-large { grid-column: 1 / -1; }
+.champ-suffixe { display: flex; align-items: center; gap: 0.5rem; }
+.champ-suffixe input { max-width: 140px; }
+.champ-suffixe span { color: var(--texte-doux); font-weight: 400; }
+.champ-court { max-width: 140px; }
+.majuscules { text-transform: uppercase; }
+.obligatoire { color: var(--erreur); }
+.texte-erreur { color: var(--erreur); }
+.barre-enregistrement {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--fond);
+  border-top: 1px solid var(--bordure);
+}
+
 .colonne-etroite { max-width: 520px; display: flex; flex-direction: column; gap: 1rem; }
 
 /* ---------- Mobile : menu en tiroir ---------- */
@@ -350,5 +381,6 @@ input:focus-visible, .bouton:focus-visible, a:focus-visible {
 
 @media (max-width: 520px) {
   .choix-role { grid-template-columns: 1fr; }
+  .grille-champs { grid-template-columns: 1fr; }
   .carte-utilisateur { flex-direction: column; align-items: stretch; }
 }

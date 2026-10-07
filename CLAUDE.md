@@ -60,13 +60,16 @@ src/
   lib/supabase.ts       client Supabase unique (variables VITE_SUPABASE_*)
   lib/types.ts          types alignés sur le schéma SQL
   lib/utilisateurs.ts   accès aux données utilisateurs (RPC + Edge Function)
+  lib/parametres.ts     définition, contrôle et enregistrement des paramètres généraux
+  lib/format.ts         formaterMontant() et autres mises en forme fr-FR
+  parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
   components/           Chargement, Fenetre (modale <dialog>)
   auth/AuthProvider.tsx session + profil (table profils), connexion / déconnexion
   auth/AuthContext.ts   contexte + hook useAuth()
   auth/Protection.tsx   RouteConnectee (session + profil actif), RouteRole (rôles)
   auth/roles.ts         menu et droits par rôle
   layouts/AppLayout.tsx barre latérale (tiroir sur mobile) + en-tête
-  pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte,
+  pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte, Parametres,
                         EnConstruction (modules à venir)
   styles.css            CSS simple avec variables (thème clair/sombre), pas de framework CSS
 sql/                    compléments au schéma, numérotés
@@ -82,7 +85,9 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 
 - Mobile d'abord (futur Android) : cibles tactiles ≥ 44 px, menu en tiroir sous 860 px.
 - Messages d'erreur Supabase traduits en français avant affichage.
-- Montants : la devise est un paramètre (`parametres.devise`), ne pas la coder en dur.
+- Montants : la devise est un paramètre ; utiliser `useParametres()` + `formaterMontant(montant, devise)`, ne pas la coder en dur.
+- Paramètres : clé/valeur texte. Nouvelle clé = l'ajouter dans `SECTIONS_PARAMETRES` (src/lib/parametres.ts) ;
+  elle est créée en base au premier enregistrement (upsert). Nombres stockés avec un point décimal (lus en `::numeric` par la base).
 
 ## Commandes
 
@@ -108,6 +113,7 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 
 - [x] Étape 1 : projet, connexion Supabase, page de connexion, navigation selon le rôle
 - [x] Étape 2 : gestion des utilisateurs (création, activation, rôle, mot de passe) + « Mon compte »
-- [ ] Paramètres, Machines & tarifs (machines, supports, finitions)
+- [x] Étape 3 : Paramètres (coordonnées, devise, TVA, marge, délais, mentions des documents)
+- [ ] Machines & tarifs (machines, supports, finitions)
 - [ ] Modules métier (clients, devis avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)
