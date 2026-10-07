@@ -1,0 +1,236 @@
+/* ---------- Thème ---------- */
+:root {
+  --fond: #f4f6fa;
+  --surface: #ffffff;
+  --texte: #111827;
+  --texte-doux: #5b6474;
+  --bordure: #e2e6ee;
+  --primaire: #1d4ed8;
+  --primaire-texte: #ffffff;
+  --primaire-doux: #e8eefc;
+  --erreur: #b42318;
+  --erreur-fond: #fef3f2;
+  --attention: #93370d;
+  --attention-fond: #fffaeb;
+  --rayon: 10px;
+  --largeur-menu: 240px;
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #0f1420;
+    --surface: #171e2d;
+    --texte: #e8ebf2;
+    --texte-doux: #9aa3b5;
+    --bordure: #273046;
+    --primaire: #5b8cff;
+    --primaire-texte: #0b1220;
+    --primaire-doux: #1c2742;
+    --erreur: #fda29b;
+    --erreur-fond: #3a1714;
+    --attention: #fec84b;
+    --attention-fond: #33270c;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); color: var(--texte); }
+h1 { font-size: 1.25rem; margin: 0; }
+code { font-size: 0.9em; }
+
+/* ---------- Éléments communs ---------- */
+.bouton {
+  font: inherit;
+  padding: 0.65rem 1rem;
+  border-radius: var(--rayon);
+  border: 1px solid var(--bordure);
+  background: var(--surface);
+  color: var(--texte);
+  cursor: pointer;
+  min-height: 44px;
+}
+.bouton:disabled { opacity: 0.6; cursor: wait; }
+.bouton-principal { background: var(--primaire); border-color: var(--primaire); color: var(--primaire-texte); font-weight: 600; }
+.bouton-discret { border-color: transparent; background: transparent; color: var(--texte-doux); padding: 0.4rem 0; min-height: 0; text-align: left; }
+.bouton-discret:hover { color: var(--texte); }
+
+input {
+  font: inherit;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--fond);
+  color: var(--texte);
+  min-height: 44px;
+}
+input:focus-visible, .bouton:focus-visible, a:focus-visible {
+  outline: 2px solid var(--primaire);
+  outline-offset: 2px;
+}
+
+.alerte { padding: 0.65rem 0.8rem; border-radius: var(--rayon); margin: 0; font-size: 0.92rem; }
+.alerte-erreur { background: var(--erreur-fond); color: var(--erreur); }
+.alerte-attention { background: var(--attention-fond); color: var(--attention); }
+
+.ecran-centre {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.75rem;
+  color: var(--texte-doux);
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--bordure);
+  border-top-color: var(--primaire);
+  border-radius: 50%;
+  animation: tourne 0.8s linear infinite;
+}
+@keyframes tourne { to { transform: rotate(360deg); } }
+
+/* ---------- Connexion ---------- */
+.page-connexion {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+.carte-connexion {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.carte-connexion h1 { font-size: 1.4rem; }
+.carte-connexion label { display: flex; flex-direction: column; gap: 0.35rem; font-weight: 500; font-size: 0.92rem; }
+.sous-titre, .aide { color: var(--texte-doux); margin: 0; }
+.aide { font-size: 0.85rem; text-align: center; }
+
+/* ---------- Application ---------- */
+.app { min-height: 100vh; }
+
+.barre-laterale {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--largeur-menu);
+  background: var(--surface);
+  border-right: 1px solid var(--bordure);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0.75rem;
+  z-index: 20;
+  overflow-y: auto;
+}
+.marque { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; font-size: 1.1rem; padding: 0 0.5rem 1rem; }
+.barre-laterale nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.lien-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--rayon);
+  color: var(--texte);
+  text-decoration: none;
+  min-height: 44px;
+}
+.lien-menu:hover { background: var(--fond); }
+.lien-menu.active { background: var(--primaire-doux); color: var(--primaire); font-weight: 600; }
+
+.utilisateur {
+  border-top: 1px solid var(--bordure);
+  padding: 0.9rem 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.utilisateur > div { display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start; }
+.badge-role {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 99px;
+  background: var(--primaire-doux);
+  color: var(--primaire);
+  font-weight: 600;
+}
+
+.contenu { margin-left: var(--largeur-menu); min-height: 100vh; display: flex; flex-direction: column; }
+.entete {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.5rem;
+  padding-top: calc(0.9rem + env(safe-area-inset-top));
+  background: var(--fond);
+  border-bottom: 1px solid var(--bordure);
+  z-index: 10;
+}
+.bouton-menu {
+  display: none;
+  font-size: 1.3rem;
+  background: none;
+  border: none;
+  color: var(--texte);
+  width: 44px; height: 44px;
+  cursor: pointer;
+  margin-left: -0.5rem;
+}
+.page { padding: 1.5rem; flex: 1; }
+.voile { display: none; }
+
+.bienvenue { margin: 0 0 1.25rem; color: var(--texte-doux); }
+.grille-raccourcis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+.tuile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  color: var(--texte);
+  text-decoration: none;
+  font-weight: 600;
+}
+.tuile:hover { border-color: var(--primaire); }
+.tuile-icone { font-size: 1.5rem; }
+
+.vide {
+  padding: 2rem;
+  text-align: center;
+  color: var(--texte-doux);
+  background: var(--surface);
+  border: 1px dashed var(--bordure);
+  border-radius: 12px;
+}
+
+/* ---------- Mobile : menu en tiroir ---------- */
+@media (max-width: 860px) {
+  .barre-laterale {
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    padding-top: calc(1rem + env(safe-area-inset-top));
+  }
+  .menu-ouvert .barre-laterale { transform: none; box-shadow: 0 0 40px rgb(0 0 0 / 0.25); }
+  .menu-ouvert .voile { display: block; position: fixed; inset: 0; background: rgb(0 0 0 / 0.35); z-index: 15; }
+  .contenu { margin-left: 0; }
+  .bouton-menu { display: block; }
+  .entete { padding-left: 1rem; padding-right: 1rem; }
+  .page { padding: 1rem; }
+}
