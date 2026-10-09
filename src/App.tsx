@@ -12,6 +12,7 @@ import EnConstruction from './pages/EnConstruction'
 import Utilisateurs from './pages/Utilisateurs'
 import MonCompte from './pages/MonCompte'
 import Parametres from './pages/Parametres'
+import Catalogue from './pages/Catalogue'
 import { ParametresProvider } from './parametres/ParametresProvider'
 
 // Pages réelles par chemin ; les autres entrées du MENU affichent « en construction »
@@ -19,6 +20,7 @@ const PAGES: Record<string, ReactNode> = {
   '/tableau-de-bord': <TableauDeBord />,
   '/utilisateurs': <Utilisateurs />,
   '/parametres': <Parametres />,
+  '/catalogue': <Catalogue />,
 }
 
 function RedirectionAccueil() {

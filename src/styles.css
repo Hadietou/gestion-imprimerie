@@ -333,6 +333,49 @@ input:focus-visible, textarea:focus-visible, .bouton:focus-visible, a:focus-visi
 .identifiants dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 .mot-de-passe { font-family: ui-monospace, Consolas, monospace; font-size: 1.15rem; letter-spacing: 0.05em; }
 
+/* ---------- Référentiels (machines, supports, finitions) ---------- */
+.bouton-danger { color: var(--erreur); border-color: var(--erreur); background: transparent; }
+.carte-ligne { display: flex; align-items: center; gap: 1rem; }
+.carte-titre { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+.onglets {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--bordure);
+  overflow-x: auto;
+}
+.onglets a {
+  padding: 0.6rem 0.9rem;
+  color: var(--texte-doux);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.onglets a:hover { color: var(--texte); }
+.onglets a.active { color: var(--primaire); border-bottom-color: var(--primaire); font-weight: 600; }
+
+.champ-choix { border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.champ-choix legend { font-weight: 500; font-size: 0.92rem; padding: 0; margin-bottom: 0.35rem; }
+.pastilles { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.formulaire label.pastille {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  min-height: 40px;
+  border: 1px solid var(--bordure);
+  border-radius: 99px;
+  cursor: pointer;
+  font-weight: 400;
+}
+.pastille input { width: auto; min-height: 0; margin: 0; accent-color: var(--primaire); }
+.pastille.selectionne { border-color: var(--primaire); background: var(--primaire-doux); color: var(--primaire); font-weight: 600; }
+
 /* ---------- Page Paramètres ---------- */
 .page-parametres { max-width: 900px; }
 .titre-carte { font-size: 1.05rem; margin: 0; }
@@ -382,5 +425,5 @@ input:focus-visible, textarea:focus-visible, .bouton:focus-visible, a:focus-visi
 @media (max-width: 520px) {
   .choix-role { grid-template-columns: 1fr; }
   .grille-champs { grid-template-columns: 1fr; }
-  .carte-utilisateur { flex-direction: column; align-items: stretch; }
+  .carte-utilisateur, .carte-ligne { flex-direction: column; align-items: stretch; }
 }
