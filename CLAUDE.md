@@ -82,6 +82,7 @@ src/
                         prixProduitLigne() (minimum au m² par pièce), montantFinition()
   lib/devis.ts          accès aux devis, statuts, calculerTotaux() (même formule que recalculer_devis)
   lib/stock.ts          articles, mouvements (entrée / sortie / ajustement), alertes, variation()
+  lib/detection.ts      detecterCategorie() d'une dépense par mots-clés, normaliser()
   lib/depenses.ts       dépenses, catégories, modes de paiement, enregistrerDepense()
   lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
@@ -140,6 +141,10 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 ## Dépenses
 
 - Gérant et compta (catégories modifiables par le gérant, `/depenses/categories`).
+- **Détection automatique** (nouvelle dépense) : le champ « Qu'avez-vous payé ? » propose les articles du stock
+  qui correspondent ; en choisir un en fait un achat (quantité, prix, catégorie d'achat). Sinon dépense simple,
+  catégorie devinée par mots-clés ([src/lib/detection.ts](src/lib/detection.ts), « Divers » par défaut).
+  Garde-fou si le libellé désigne un article du stock sans qu'il ait été choisi.
 - Catégorie `achat_stock` : à la création, liste d'articles (support, quantité, prix unitaire) ; montant = somme ;
   entrées en stock **définitives** (mouvements `entree` reliés par `depense_id`) → dépense non supprimable,
   correction par ajustement de stock. Les autres dépenses : saisie simple, bouton Dupliquer pour les récurrentes.

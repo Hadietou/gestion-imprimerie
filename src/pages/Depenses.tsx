@@ -14,7 +14,8 @@ import {
   type ModePaiement,
 } from '../lib/depenses'
 import { formaterMontant } from '../lib/format'
-import { LIBELLES_CATEGORIES_SUPPORT, LIBELLES_UNITES } from '../lib/libelles'
+import { LIBELLES_CATEGORIES_SUPPORT, LIBELLES_UNITES, uniteAccordee } from '../lib/libelles'
+import { categorieParDefaut, detecterCategorie, normaliser } from '../lib/detection'
 import { supabase } from '../lib/supabase'
 import type { CategorieSupport, Support } from '../lib/types'
 import { useParametres } from '../parametres/ParametresContext'
@@ -246,7 +247,10 @@ function FicheDepense({
   const source = depense ?? modele
   const actives = categories.filter((c) => c.actif || c.id === source?.categorie_id)
   const [date, setDate] = useState(depense ? depense.date_depense : aujourdhui())
-  const [categorieId, setCategorieId] = useState(String(source?.categorie_id ?? actives[0]?.id ?? ''))
+  const [categorieId, setCategorieId] = useState(String(source?.categorie_id ?? categorieParDefaut(categories)?.id ?? ''))
+  // Nouvelle dépense : catégorie déduite du libellé ou de l'article choisi, tant qu'on ne la change pas à la main
+  const [categorieAuto, setCategorieAuto] = useState(!source)
+  const [suggestionsOuvertes, setSuggestionsOuvertes] = useState(false)
   const [libelle, setLibelle] = useState(source?.libelle ?? '')
   const [montant, setMontant] = useState(source ? texte(Number(source.montant)) : '')
   const [mode, setMode] = useState<ModePaiement>(source?.mode ?? 'especes')
@@ -260,11 +264,14 @@ function FicheDepense({
   const [erreur, setErreur] = useState<string | null>(null)
 
   const categorie = categories.find((c) => String(c.id) === categorieId)
-  // Les articles ne se saisissent qu'à la création d'un achat
-  const saisieArticles = !depense && Boolean(categorie?.achat_stock)
+  const categorieAchat = categories.find((c) => c.actif && c.achat_stock)
+  const articlesChoisis = articles.filter((a) => a.support_id).length
+  // Articles saisis seulement à la création : article du stock reconnu, ou catégorie d'achat choisie
+  const saisieArticles = !depense && (Boolean(categorie?.achat_stock) || articlesChoisis > 0)
 
+  // Articles du stock : chargés pour les reconnaître dès la saisie du libellé
   useEffect(() => {
-    if (!saisieArticles) return
+    if (depense) return
     let actuel = true
     supabase
       .from('supports')
@@ -275,7 +282,48 @@ function FicheDepense({
     return () => {
       actuel = false
     }
-  }, [saisieArticles])
+  }, [depense])
+
+  // Articles du stock qui correspondent au libellé saisi
+  const termes = normaliser(libelle).split(/[^a-z0-9]+/).filter((t) => t.length >= 2)
+  const suggestions =
+    !depense && suggestionsOuvertes && termes.length > 0
+      ? supports
+          .filter((sp) => !articles.some((a) => a.support_id === String(sp.id)))
+          .filter((sp) => {
+            const nom = normaliser(`${sp.nom} ${LIBELLES_CATEGORIES_SUPPORT[sp.categorie]}`)
+            return termes.every((t) => nom.includes(t))
+          })
+          .slice(0, 6)
+      : []
+
+  // Libellé qui désigne visiblement un article du stock, sans que la suggestion ait été choisie
+  const articleProbable =
+    !depense && articlesChoisis === 0 && termes.join('').length >= 5
+      ? supports.find((sp) => termes.every((t) => normaliser(sp.nom).includes(t)))
+      : undefined
+
+  function changerLibelle(texteSaisi: string) {
+    setLibelle(texteSaisi)
+    setSuggestionsOuvertes(true)
+    if (categorieAuto && articlesChoisis === 0) {
+      const detectee = detecterCategorie(texteSaisi, categories) ?? categorieParDefaut(categories)
+      if (detectee) setCategorieId(String(detectee.id))
+    }
+  }
+
+  // Article du stock reconnu : la dépense devient un achat avec quantité et prix
+  function choisirArticle(sp: Support) {
+    setArticles((ls) => {
+      const prix = sp.prix_unitaire > 0 ? texte(sp.prix_unitaire) : ''
+      const vide = ls.findIndex((a) => !a.support_id && !a.quantite && !a.prix_unitaire)
+      const ligne = { ...ligneArticle(), support_id: String(sp.id), prix_unitaire: prix }
+      return vide >= 0 ? ls.map((a, i) => (i === vide ? ligne : a)) : [...ls, ligne]
+    })
+    if (categorieAuto && categorieAchat) setCategorieId(String(categorieAchat.id))
+    if (articlesChoisis === 0) setLibelle(`Achat ${sp.nom}`)
+    setSuggestionsOuvertes(false)
+  }
 
   const articlesRemplis = articles.filter((a) => a.support_id || a.quantite || a.prix_unitaire)
   const totalArticles = articlesRemplis.reduce((s, a) => s + (versNombre(a.quantite) || 0) * (versNombre(a.prix_unitaire) || 0), 0)
@@ -291,6 +339,15 @@ function FicheDepense({
       if (!a.support_id) return setErreur('Choisissez l’article de chaque ligne.')
       if (!(versNombre(a.quantite) > 0)) return setErreur('Chaque article doit avoir une quantité supérieure à 0.')
       if (!(versNombre(a.prix_unitaire) >= 0)) return setErreur('Prix unitaire invalide.')
+    }
+    if (
+      articleProbable &&
+      confirm(
+        `« ${libelle.trim()} » correspond à l’article du stock « ${articleProbable.nom} ».\n\nOK : saisir la quantité achetée pour l’entrer en stock.\nAnnuler : enregistrer comme dépense simple.`,
+      )
+    ) {
+      choisirArticle(articleProbable)
+      return
     }
     if (!(m > 0)) return setErreur('Le montant doit être supérieur à 0.')
     if (
@@ -359,30 +416,61 @@ function FicheDepense({
     <Fenetre titre={depense ? depense.libelle : modele ? 'Nouvelle dépense (copie)' : 'Nouvelle dépense'} onFermer={onFermer}>
       <form className="formulaire" onSubmit={valider} noValidate>
         <div className="grille-champs">
+          <div className="champ-large champ-personnalise champ-libelle">
+            <label htmlFor="dep-libelle" className="libelle-champ">
+              Qu’avez-vous payé ?<span className="obligatoire" aria-hidden="true"> *</span>
+            </label>
+            <input
+              id="dep-libelle"
+              autoComplete="off"
+              placeholder="Ex. Couché brillant 135 g, Facture SOMELEC, Salaire, Ordinateur…"
+              value={libelle}
+              onChange={(e) => changerLibelle(e.target.value)}
+              aria-describedby="dep-libelle-aide"
+            />
+            {suggestions.length > 0 && (
+              <ul className="resultats-client suggestions-stock" aria-label="Articles du stock correspondants">
+                {suggestions.map((sp) => (
+                  <li key={sp.id}>
+                    <button type="button" onClick={() => choisirArticle(sp)}>
+                      <strong>📦 {sp.nom}</strong>
+                      <span className="texte-doux petit">
+                        Article du stock · {Number(sp.stock_actuel).toLocaleString('fr-FR')} {uniteAccordee(sp.unite, sp.stock_actuel)} en
+                        stock — cliquez pour saisir la quantité achetée
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {!depense && (
+              <small id="dep-libelle-aide" className="texte-doux">
+                Un article du stock (papier, encre, bâche…) est reconnu pendant la saisie ; sinon c’est une dépense simple.
+              </small>
+            )}
+          </div>
           <label htmlFor="dep-categorie">
             <span>Catégorie</span>
-            <select id="dep-categorie" value={categorieId} onChange={(e) => setCategorieId(e.target.value)} disabled={Boolean(depense?.entrees.length)}>
+            <select
+              id="dep-categorie"
+              value={categorieId}
+              onChange={(e) => {
+                setCategorieId(e.target.value)
+                setCategorieAuto(false)
+              }}
+              disabled={Boolean(depense?.entrees.length)}
+            >
               {actives.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.nom}
                 </option>
               ))}
             </select>
+            {categorieAuto && libelle.trim() && <small className="texte-doux">Détectée automatiquement — modifiable.</small>}
           </label>
           <label htmlFor="dep-date">
             <span>Date</span>
             <input id="dep-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
-          <label className="champ-large" htmlFor="dep-libelle">
-            <span>
-              Libellé<span className="obligatoire" aria-hidden="true"> *</span>
-            </span>
-            <input
-              id="dep-libelle"
-              placeholder={categorie?.achat_stock ? 'Ex. Achat papier et encres — Librairie X' : 'Ex. Facture électricité septembre'}
-              value={libelle}
-              onChange={(e) => setLibelle(e.target.value)}
-            />
           </label>
 
           {saisieArticles && (
