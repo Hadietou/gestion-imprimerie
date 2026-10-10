@@ -8,6 +8,7 @@ export type CleParametre =
   | 'nom_imprimerie'
   | 'adresse'
   | 'telephone'
+  | 'indicatif_telephone'
   | 'email'
   | 'numero_fiscal'
   | 'registre_commerce'
@@ -47,6 +48,14 @@ export const SECTIONS_PARAMETRES: SectionParametres[] = [
       { cle: 'nom_imprimerie', libelle: "Nom de l'imprimerie", type: 'texte', obligatoire: true },
       { cle: 'adresse', libelle: 'Adresse', type: 'texte_long' },
       { cle: 'telephone', libelle: 'Téléphone', type: 'telephone' },
+      {
+        cle: 'indicatif_telephone',
+        libelle: 'Indicatif téléphonique du pays',
+        aide: 'Ajouté aux numéros des clients pour WhatsApp (222 = Mauritanie).',
+        type: 'entier',
+        min: 1,
+        max: 999,
+      },
       { cle: 'email', libelle: 'E-mail', type: 'email' },
       { cle: 'numero_fiscal', libelle: 'Numéro d’identification fiscale (NIF)', type: 'texte' },
       { cle: 'registre_commerce', libelle: 'Registre du commerce (RC)', type: 'texte' },
@@ -88,6 +97,7 @@ const VALEURS_PAR_DEFAUT: Parametres = {
   nom_imprimerie: 'Mon Imprimerie',
   adresse: '',
   telephone: '',
+  indicatif_telephone: '222',
   email: '',
   numero_fiscal: '',
   registre_commerce: '',

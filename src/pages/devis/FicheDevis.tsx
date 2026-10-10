@@ -13,6 +13,9 @@ import {
 import { useParametres } from '../../parametres/ParametresContext'
 import Fenetre from '../../components/Fenetre'
 import { commandeDuDevis, creerCommandeDepuisDevis } from '../../lib/commandes'
+import BoutonEnvoyer from '../../components/BoutonEnvoyer'
+import { formaterMontant } from '../../lib/format'
+import { estApplicationNative } from '../../lib/partage'
 import DocumentDevis from './DocumentDevis'
 
 // demi : moitié haute d'une feuille A4, découpée ensuite au milieu ; A4 : page entière
@@ -81,6 +84,25 @@ export default function FicheDevis() {
   const statut = statutAffiche(devis)
   const modifiable = peutModifier && (devis.statut === 'brouillon' || devis.statut === 'envoye')
 
+  // Message accompagnant le PDF envoyé au client
+  const fin = new Date(`${devis.date_devis}T12:00:00`)
+  fin.setDate(fin.getDate() + devis.validite_jours)
+  const messageClient = [
+    `Bonjour ${devis.client.contact || devis.client.nom},`,
+    `Veuillez trouver ci-joint notre devis ${devis.numero}${devis.objet ? ` (${devis.objet})` : ''} d’un montant de ${formaterMontant(Number(devis.total_ttc), parametres.devise)}${devis.taux_tva > 0 ? ' TTC' : ''}, valable jusqu’au ${fin.toLocaleDateString('fr-FR')}.`,
+    'Cordialement,',
+    [parametres.nom_imprimerie, parametres.telephone].filter(Boolean).join(' — '),
+  ].join('\n')
+  const proprietesEnvoi = {
+    zone: zoneDocument,
+    format: impression,
+    numero: devis.numero,
+    client: devis.client.nom,
+    telephone: devis.client.telephone,
+    indicatif: parametres.indicatif_telephone,
+    message: messageClient,
+  }
+
   async function passerA(nouveau: StatutDevis) {
     setAction(true)
     setErreur(null)
@@ -137,9 +159,18 @@ export default function FicheDevis() {
             </button>
           ))}
         </div>
-        <button type="button" className="bouton bouton-principal" onClick={() => window.print()}>
-          Imprimer / PDF
-        </button>
+        {estApplicationNative() ? (
+          <BoutonEnvoyer {...proprietesEnvoi} impression />
+        ) : (
+          <button type="button" className="bouton bouton-principal" onClick={() => window.print()}>
+            Imprimer / PDF
+          </button>
+        )}
+        <BoutonEnvoyer
+          {...proprietesEnvoi}
+          // Un devis en brouillon envoyé au client passe à « envoyé »
+          onEnvoye={() => devis.statut === 'brouillon' && peutModifier && passerA('envoye')}
+        />
         {modifiable && (
           <Link to={`/devis/${devis.id}/modifier`} className="bouton">
             Modifier

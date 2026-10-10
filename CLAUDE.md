@@ -90,9 +90,12 @@ src/
   lib/factures.ts       factures, paiements, impayés (vue v_impayes), resteAPayer()
   lib/tableauDeBord.ts  indicateurs par rôle (chaque bloc indépendant : RLS ou module absent n'empêche pas les autres)
   lib/depenses.ts       dépenses, catégories, modes de paiement, enregistrerDepense()
+  lib/partage.ts        PDF d'un .document (html2canvas-pro + jsPDF, chargés à la demande) et envoi :
+                        Android natif → Share ; téléphone → navigator.share ; ordinateur → téléchargement + wa.me
   lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
   components/           Chargement, Fenetre (modale <dialog>), GraphiqueFinances (colonnes encaissé / dépenses),
+                        BoutonEnvoyer (📤 WhatsApp ; « PDF / Imprimer » dans l'application Android),
                         Referentiel : recherche sans accents (texteRecherche), peutSupprimer, saisie email/tel,
                         Referentiel (liste groupée + fiche pilotée par des ChampFiche)
   auth/AuthProvider.tsx session + profil (table profils), connexion / déconnexion
@@ -208,6 +211,12 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 - `public/_headers` (Cloudflare) : pas de cache pour sw.js, registerSW.js, manifest et index.html.
 - Le navigateur intégré de l'outil de développement n'enregistre pas les service workers : tester l'installation
   dans Chrome / Edge sur le site publié.
+
+## Envoi WhatsApp
+
+- « 📤 Envoyer (WhatsApp) » sur les fiches devis et facture : PDF de la copie hors écran `.export-pdf`
+  (210 mm, sans les règles « petit écran », limitées à `.feuille`), message prêt (montant, validité / reste à payer).
+  Numéro : indicatif `parametres.indicatif_telephone` (222) ajouté aux numéros locaux. Devis en brouillon → « envoyé ».
 
 ## Commandes
 

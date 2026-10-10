@@ -14,6 +14,8 @@ import {
 } from '../../lib/factures'
 import { formaterMontant } from '../../lib/format'
 import { useParametres } from '../../parametres/ParametresContext'
+import BoutonEnvoyer from '../../components/BoutonEnvoyer'
+import { estApplicationNative } from '../../lib/partage'
 import DocumentFacture from './DocumentFacture'
 
 // Fiche d'une facture : document imprimable, paiements, annulation.
@@ -73,6 +75,29 @@ export default function FicheFacture() {
   const peutAnnuler = (role === 'gerant' || role === 'compta') && f.statut !== 'annulee'
   const reste = resteAPayer(f)
 
+  // Message accompagnant le PDF envoyé au client
+  const messageClient = [
+    `Bonjour ${f.client.contact || f.client.nom},`,
+    `Veuillez trouver ci-joint la facture ${f.numero} d’un montant de ${formaterMontant(Number(f.total_ttc), devise)}.`,
+    reste > 0
+      ? `Reste à payer : ${formaterMontant(reste, devise)}${f.date_echeance ? `, avant le ${new Date(`${f.date_echeance}T12:00:00`).toLocaleDateString('fr-FR')}` : ''}.`
+      : 'Cette facture est entièrement réglée. Merci !',
+    reste > 0 && parametres.coordonnees_bancaires ? `Règlement : ${parametres.coordonnees_bancaires.split('\n')[0]}` : '',
+    'Merci pour votre confiance.',
+    [parametres.nom_imprimerie, parametres.telephone].filter(Boolean).join(' — '),
+  ]
+    .filter(Boolean)
+    .join('\n')
+  const proprietesEnvoi = {
+    zone: zoneDocument,
+    format: impression,
+    numero: f.numero,
+    client: f.client.nom,
+    telephone: f.client.telephone,
+    indicatif: parametres.indicatif_telephone,
+    message: messageClient,
+  }
+
   async function annuler() {
     if (!confirm(`Annuler la facture ${f.numero} ? Elle restera visible (annulée) ; la commande pourra être refacturée.`)) return
     try {
@@ -118,9 +143,14 @@ export default function FicheFacture() {
             </button>
           ))}
         </div>
-        <button type="button" className="bouton bouton-principal" onClick={() => window.print()}>
-          Imprimer / PDF
-        </button>
+        {estApplicationNative() ? (
+          <BoutonEnvoyer {...proprietesEnvoi} impression />
+        ) : (
+          <button type="button" className="bouton bouton-principal" onClick={() => window.print()}>
+            Imprimer / PDF
+          </button>
+        )}
+        <BoutonEnvoyer {...proprietesEnvoi} />
       </div>
 
       {/* Paiements */}
