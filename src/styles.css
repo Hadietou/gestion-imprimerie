@@ -433,6 +433,13 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .resultats-client button { width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem; padding: 0.55rem 0.7rem; border: none; border-radius: 8px; background: none; color: var(--texte); font: inherit; text-align: left; cursor: pointer; min-height: 44px; }
 .resultats-client button:hover { background: var(--primaire-doux); }
 .resultats-client .aucun { padding: 0.55rem 0.7rem; }
+.resultats-client .creer-client { border-top: 1px solid var(--bordure); border-radius: 0 0 8px 8px; color: var(--primaire); }
+.creer-client-lien { align-self: flex-start; color: var(--primaire); }
+.creation-client { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.9rem; border: 2px solid var(--primaire); border-radius: var(--rayon); background: var(--primaire-doux); }
+.creation-client label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.9rem; font-weight: 500; }
+.creation-client input { background: var(--surface); }
+.creation-client .pastille { font: inherit; font-size: 0.88rem; background: var(--surface); color: var(--texte); padding: 0.4rem 0.8rem; border: 1px solid var(--bordure); border-radius: 99px; cursor: pointer; min-height: 36px; }
+.creation-client .pastille.selectionne { border-color: var(--primaire); background: var(--primaire); color: var(--primaire-texte); font-weight: 600; }
 
 .lignes-devis { counter-reset: none; }
 .ligne-devis { display: flex; flex-direction: column; gap: 0.75rem; }

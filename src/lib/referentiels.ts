@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import type { Client } from './types'
 
 // Accès générique aux tables de référence (machines, supports, finitions, puis clients…)
 // Chaque ligne a un id numérique, un nom et un indicateur actif.
@@ -36,4 +37,16 @@ export async function enregistrer(table: TableReferentiel, id: number | null, va
 export async function supprimer(table: TableReferentiel, id: number) {
   const { error } = await supabase.from(table).delete().eq('id', id)
   if (error) throw new Error(traduire(error.message, error.code))
+}
+
+/** Création rapide d'un client (depuis un devis) : renvoie la fiche enregistrée */
+export async function creerClient(champs: {
+  type_client: string
+  nom: string
+  telephone: string | null
+  contact: string | null
+}): Promise<Client> {
+  const { data, error } = await supabase.from('clients').insert(champs).select('*').single()
+  if (error) throw new Error(traduire(error.message, error.code))
+  return data as Client
 }

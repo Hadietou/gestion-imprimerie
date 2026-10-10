@@ -134,6 +134,8 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 - Routes : `/devis` liste, `/devis/nouveau` (`?copie=ID` pour dupliquer), `/devis/:id` fiche imprimable, `/devis/:id/modifier`.
 - Prix **figés** : une ligne n'est recalculée que si on la modifie (quantité, dimensions, produit, finitions) ;
   `detail_calcul` garde `prix_produit`, `detail` et `prix_force` (prix saisi à la main ; finitions alors enregistrées à 0).
+- **Client** : recherche par nom ou téléphone ; s’il n’existe pas, « + Créer le client » le crée sur place
+  (`creerClient`, type, nom, téléphone, contact) et le choisit. Entrée = choisir le seul résultat ou créer.
 - **Objet automatique** : `resumerObjet()` (edition.ts) résume les produits (« Carte de visite × 500, Bâche × 2 et 1 autre ») ;
   non saisissable, recalculé à chaque enregistrement.
 - Section « Produits et travaux » : une ligne neuve ne montre que « Choisir un produit… » ; « Autre travail » (`libre`,
