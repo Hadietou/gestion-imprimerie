@@ -376,6 +376,31 @@ input:focus-visible, textarea:focus-visible, .bouton:focus-visible, a:focus-visi
 .pastille input { width: auto; min-height: 0; margin: 0; accent-color: var(--primaire); }
 .pastille.selectionne { border-color: var(--primaire); background: var(--primaire-doux); color: var(--primaire); font-weight: 600; }
 
+.champ-personnalise { display: flex; flex-direction: column; gap: 0.35rem; }
+.libelle-champ { font-weight: 500; font-size: 0.92rem; }
+
+.paliers { display: flex; flex-direction: column; gap: 0.4rem; }
+.paliers-entete, .palier {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+  gap: 0.5rem;
+  align-items: center;
+}
+.paliers .bouton-discret { align-self: flex-start; color: var(--primaire); }
+
+.simulateur {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--rayon);
+  background: var(--primaire-doux);
+}
+.simulateur .champ-suffixe input { max-width: 120px; background: var(--surface); }
+.resultat-simulation { margin: 0; }
+.resultat-simulation strong { font-size: 1.1rem; }
+
 /* ---------- Page Paramètres ---------- */
 .page-parametres { max-width: 900px; }
 .titre-carte { font-size: 1.05rem; margin: 0; }

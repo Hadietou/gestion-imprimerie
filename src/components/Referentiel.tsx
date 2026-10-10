@@ -6,13 +6,20 @@ import { enregistrer, lister, supprimer, type LigneReferentiel, type TableRefere
 // Les champs du formulaire sont décrits par des ChampFiche ; libellés, aides et
 // visibilité peuvent dépendre des autres valeurs (ex. la technique d'une machine).
 
-export type Valeurs = Record<string, string | boolean | string[]>
+export type Valeurs = Record<string, unknown>
 type Dynamique = string | ((v: Valeurs) => string)
+
+export interface ProprietesEditeur {
+  valeur: unknown
+  valeurs: Valeurs
+  onChange: (v: unknown) => void
+  erreur?: string
+}
 
 export interface ChampFiche {
   cle: string
   libelle: Dynamique
-  type: 'texte' | 'texte_long' | 'nombre' | 'entier' | 'choix' | 'choix_multiple' | 'booleen'
+  type: 'texte' | 'texte_long' | 'nombre' | 'entier' | 'choix' | 'choix_multiple' | 'booleen' | 'personnalise'
   options?: { valeur: string; libelle: string }[]
   suffixe?: Dynamique
   aide?: Dynamique
@@ -23,6 +30,12 @@ export interface ChampFiche {
   max?: number
   visible?: (v: Valeurs) => boolean
   large?: boolean
+  /** Type 'personnalise' : éditeur libre (ex. grille de paliers, simulateur) */
+  editeur?: (p: ProprietesEditeur) => ReactNode
+  /** Type 'personnalise' : valeur de formulaire initiale à partir de la valeur en base */
+  initialiser?: (valeurEnBase: unknown) => unknown
+  /** Type 'personnalise' : contrôle et conversion vers la base. Absent = champ non enregistré. */
+  convertir?: (valeur: unknown, valeurs: Valeurs) => { valeur: unknown } | { erreur: string }
 }
 
 const texte = (d: Dynamique | undefined, v: Valeurs) => (typeof d === 'function' ? d(v) : d)
@@ -32,7 +45,8 @@ function versFormulaire(ligne: Record<string, unknown> | null, champs: ChampFich
   const valeurs: Valeurs = {}
   for (const c of champs) {
     const v = ligne ? ligne[c.cle] : defauts[c.cle]
-    if (c.type === 'booleen') valeurs[c.cle] = v === undefined ? true : Boolean(v)
+    if (c.type === 'personnalise') valeurs[c.cle] = c.initialiser ? c.initialiser(v) : v
+    else if (c.type === 'booleen') valeurs[c.cle] = v === undefined ? true : Boolean(v)
     else if (c.type === 'choix_multiple') valeurs[c.cle] = Array.isArray(v) ? (v as string[]) : []
     else if (typeof v === 'number') valeurs[c.cle] = String(v).replace('.', ',')
     else valeurs[c.cle] = typeof v === 'string' ? v : ''
@@ -48,6 +62,15 @@ function depuisFormulaire(valeurs: Valeurs, champs: ChampFiche[]) {
   for (const c of champs) {
     const v = valeurs[c.cle]
     const visible = estVisible(c, valeurs)
+
+    if (c.type === 'personnalise') {
+      if (!c.convertir) continue
+      const resultat = c.convertir(v, valeurs)
+      if ('erreur' in resultat) {
+        if (visible) erreurs[c.cle] = resultat.erreur
+      } else donnees[c.cle] = resultat.valeur
+      continue
+    }
 
     if (c.type === 'booleen' || c.type === 'choix_multiple') {
       if (visible && c.obligatoire && Array.isArray(v) && v.length === 0) erreurs[c.cle] = 'Choisissez au moins une option.'
@@ -331,6 +354,16 @@ function ChampSaisie({
       {c.obligatoire && <span className="obligatoire" aria-hidden="true"> *</span>}
     </span>
   )
+
+  if (c.type === 'personnalise') {
+    return (
+      <div className="champ-large champ-personnalise">
+        <span className="libelle-champ">{entete}</span>
+        {c.editeur?.({ valeur: v, valeurs, onChange, erreur })}
+        {pied}
+      </div>
+    )
+  }
 
   if (c.type === 'booleen') {
     return (

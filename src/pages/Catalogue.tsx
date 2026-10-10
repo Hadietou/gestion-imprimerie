@@ -10,8 +10,10 @@ import {
 } from '../lib/libelles'
 import type { Finition, Machine, Support, Technique, UniteSupport } from '../lib/types'
 import { useParametres } from '../parametres/ParametresContext'
+import Produits from './Produits'
 
-// Machines, supports et finitions : données utilisées par le calcul des devis.
+// Tarifs et catalogue : produits avec leur grille de prix de vente (base des devis),
+// finitions, supports (stock) et machines (atelier).
 // Écriture réservée au gérant (RLS), lecture pour tous les rôles.
 
 export default function Catalogue() {
@@ -20,16 +22,18 @@ export default function Catalogue() {
   return (
     <>
       <nav className="onglets" aria-label="Catalogue">
-        <NavLink to="machines">Machines</NavLink>
-        <NavLink to="supports">Papiers & supports</NavLink>
+        <NavLink to="produits">Produits & prix</NavLink>
         <NavLink to="finitions">Finitions</NavLink>
+        <NavLink to="supports">Papiers & supports</NavLink>
+        <NavLink to="machines">Machines</NavLink>
       </nav>
       <Routes>
-        <Route index element={<Navigate to="machines" replace />} />
-        <Route path="machines" element={<Machines devise={devise} />} />
-        <Route path="supports" element={<Supports devise={devise} />} />
+        <Route index element={<Navigate to="produits" replace />} />
+        <Route path="produits" element={<Produits devise={devise} />} />
         <Route path="finitions" element={<Finitions devise={devise} />} />
-        <Route path="*" element={<Navigate to="machines" replace />} />
+        <Route path="supports" element={<Supports devise={devise} />} />
+        <Route path="machines" element={<Machines />} />
+        <Route path="*" element={<Navigate to="produits" replace />} />
       </Routes>
     </>
   )
@@ -39,25 +43,18 @@ const mm = (l: number | null, h: number | null) => (l && h ? `${l} × ${h} mm` :
 const assembler = (...parties: (string | number | null | false | undefined)[]) => parties.filter(Boolean).join(' · ')
 
 // ---------------------------------------------------------------- Machines
+// Fiche simplifiée : sert à affecter les travaux aux machines dans l'atelier.
+// Les colonnes de coûts de la table machines ne sont plus utilisées.
 
 const technique = (v: Valeurs) => v.technique as Technique
-const pour = (...techniques: Technique[]) => (v: Valeurs) => techniques.includes(technique(v))
 
-const UNITE_CADENCE: Record<Technique, string> = {
-  numerique: 'feuilles/h',
-  offset: 'feuilles/h',
-  grand_format: 'm²/h',
-  serigraphie: 'pièces/h',
-}
-
-function Machines({ devise }: { devise: string }) {
+function Machines() {
   const champs: ChampFiche[] = [
-    { cle: 'technique', libelle: 'Technique', type: 'choix', options: options(LIBELLES_TECHNIQUES), obligatoire: true },
     { cle: 'nom', libelle: 'Nom de la machine', type: 'texte', obligatoire: true, large: true },
+    { cle: 'technique', libelle: 'Technique', type: 'choix', options: options(LIBELLES_TECHNIQUES), obligatoire: true },
     {
       cle: 'largeur_max_mm',
       libelle: (v) => (technique(v) === 'grand_format' ? 'Laize maximale' : 'Largeur maximale'),
-      aide: (v) => (technique(v) === 'grand_format' ? 'Largeur utile d’impression.' : 'Format de feuille maximal.'),
       type: 'entier',
       suffixe: 'mm',
       facultatif: true,
@@ -72,115 +69,23 @@ function Machines({ devise }: { devise: string }) {
       min: 0,
       visible: (v) => technique(v) !== 'grand_format',
     },
-    {
-      cle: 'nb_couleurs_max',
-      libelle: (v) => (technique(v) === 'offset' ? 'Nombre de groupes (couleurs)' : 'Nombre de stations (couleurs)'),
-      type: 'entier',
-      facultatif: true,
-      min: 1,
-      visible: pour('offset', 'serigraphie'),
-    },
-    {
-      cle: 'cadence_heure',
-      libelle: 'Cadence',
-      type: 'entier',
-      suffixe: (v) => UNITE_CADENCE[technique(v)] ?? '/h',
-      facultatif: true,
-      min: 0,
-    },
-    {
-      cle: 'prix_clic_couleur',
-      libelle: 'Prix du clic couleur',
-      aide: 'Coût par face imprimée (contrat de maintenance).',
-      type: 'nombre',
-      suffixe: `${devise} / clic`,
-      min: 0,
-      visible: pour('numerique'),
-    },
-    {
-      cle: 'prix_clic_nb',
-      libelle: 'Prix du clic noir',
-      type: 'nombre',
-      suffixe: `${devise} / clic`,
-      min: 0,
-      visible: pour('numerique'),
-    },
-    {
-      cle: 'cout_plaque',
-      libelle: 'Coût d’une plaque',
-      aide: 'Une plaque par couleur et par face.',
-      type: 'nombre',
-      suffixe: devise,
-      min: 0,
-      visible: pour('offset'),
-    },
-    {
-      cle: 'cout_ecran',
-      libelle: 'Coût d’un écran',
-      aide: 'Un écran par couleur.',
-      type: 'nombre',
-      suffixe: devise,
-      min: 0,
-      visible: pour('serigraphie'),
-    },
-    {
-      cle: 'cout_calage',
-      libelle: 'Coût de calage',
-      aide: 'Mise en route, par couleur et par face.',
-      type: 'nombre',
-      suffixe: devise,
-      min: 0,
-      visible: pour('offset', 'serigraphie'),
-    },
-    {
-      cle: 'cout_encre_m2',
-      libelle: 'Coût d’encre au m²',
-      type: 'nombre',
-      suffixe: `${devise} / m²`,
-      min: 0,
-      visible: pour('grand_format'),
-    },
-    {
-      cle: 'cout_horaire',
-      libelle: 'Coût horaire',
-      aide: 'Machine + opérateur (amortissement, électricité, salaire).',
-      type: 'nombre',
-      suffixe: `${devise} / h`,
-      min: 0,
-    },
-    {
-      cle: 'gache_pct_defaut',
-      libelle: 'Gâche par défaut',
-      aide: 'Part de supports perdus aux réglages.',
-      type: 'nombre',
-      suffixe: '%',
-      min: 0,
-      max: 100,
-    },
-    { cle: 'notes', libelle: 'Notes', type: 'texte_long' },
-    { cle: 'actif', libelle: 'Machine en service (proposée dans les devis)', type: 'booleen' },
+    { cle: 'notes', libelle: 'Notes', aide: 'Consignes, entretien, particularités…', type: 'texte_long' },
+    { cle: 'actif', libelle: 'Machine en service', type: 'booleen' },
   ]
-
-  const prix = (n: number, unite = '') => formaterMontant(n, devise) + unite
 
   return (
     <Referentiel<Machine>
       table="machines"
       libelleNouveau="Nouvelle machine"
       champs={champs}
-      defauts={{ technique: 'numerique', gache_pct_defaut: '3', actif: true }}
+      defauts={{ technique: 'numerique', actif: true }}
       groupe={(m) => LIBELLES_TECHNIQUES[m.technique]}
       ordreGroupes={Object.values(LIBELLES_TECHNIQUES)}
-      messageVide="Aucune machine. Ajoutez vos presses, imprimantes et carrousels de sérigraphie."
+      messageVide="Aucune machine. Ajoutez vos presses, imprimantes et carrousels : ils serviront à organiser la production."
       resume={(m) =>
         assembler(
-          mm(m.largeur_max_mm, m.technique === 'grand_format' ? null : m.hauteur_max_mm),
-          m.nb_couleurs_max && `${m.nb_couleurs_max} couleur${m.nb_couleurs_max > 1 ? 's' : ''}`,
-          m.technique === 'numerique' && `clic couleur ${prix(m.prix_clic_couleur)}`,
-          m.technique === 'offset' && `plaque ${prix(m.cout_plaque)}`,
-          m.technique === 'serigraphie' && `écran ${prix(m.cout_ecran)}`,
-          m.technique === 'grand_format' && `encre ${prix(m.cout_encre_m2, '/m²')}`,
-          m.cout_horaire > 0 && prix(m.cout_horaire, '/h'),
+          m.technique === 'grand_format' ? m.largeur_max_mm && `laize ${m.largeur_max_mm} mm` : mm(m.largeur_max_mm, m.hauteur_max_mm),
+          m.notes,
         )
       }
     />

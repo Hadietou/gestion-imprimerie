@@ -52,6 +52,26 @@ export interface Support {
   actif: boolean
 }
 
+export type ModePrix = 'forfait' | 'par_unite' | 'par_m2' | 'par_metre_lineaire' | 'par_mille' | 'par_lot'
+
+export interface Palier {
+  quantite: number
+  prix: number
+}
+
+// Produit vendu, avec sa grille de prix (sql/03_produits.sql)
+export interface Produit {
+  id: number
+  nom: string
+  technique: Technique
+  mode_prix: ModePrix
+  prix: number
+  quantite_minimum: number
+  paliers: Palier[]
+  description: string | null
+  actif: boolean
+}
+
 export interface Finition {
   id: number
   nom: string

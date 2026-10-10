@@ -20,6 +20,12 @@ Toute l'interface, les messages et le code métier (noms de variables, composant
   — **à relire avant toute fonctionnalité touchant aux données.** Scripts rejouables dans Supabase > SQL Editor.
   Toute évolution de la base = un nouveau fichier `sql/NN_*.sql` rejouable (ne pas modifier un script déjà exécuté).
   - `sql/02_utilisateurs.sql` : fonction `liste_utilisateurs()` (e-mails, réservée au gérant), garde-fou « au moins un gérant actif ».
+  - `sql/03_produits.sql` : table `produits` (grille de prix de vente) et type `mode_prix`.
+- **Prix des devis = grille de prix de vente** (pratique du marché), PAS un calcul de coût machine.
+  Chaque produit a un `mode_prix` (forfait, par unité, m², mètre linéaire, mille, par lot), un prix de base,
+  un minimum facturé et des `paliers` JSON. Calcul unique dans [src/lib/tarifs.ts](src/lib/tarifs.ts) (`calculerPrix`).
+  Les colonnes de coûts de `machines` (clic, plaque, calage…) et de `devis_lignes` (couleurs, poses, gâche, marge)
+  ne sont plus utilisées par l'interface ; la fiche machine sert à l'atelier (nom, technique, format).
 - Beaucoup de logique est **côté base** ; ne pas la refaire côté client :
   numérotation `DEV-/CMD-/FAC-AAAA-0001`, TVA par défaut, totaux des devis, stock via `mouvements_stock`,
   `montant_paye` et statut des factures via `paiements`, création auto du profil à l'inscription.
@@ -47,7 +53,7 @@ Les droits du menu **reprennent les droits de lecture RLS** ; si on modifie les 
 | Production        | ✓ | ✓ | ✓ |   |
 | Factures, Impayés | ✓ | ✓ (lecture) |   | ✓ |
 | Stock             | ✓ | ✓ | ✓ |   |
-| Machines & tarifs, Utilisateurs, Paramètres | ✓ | | | |
+| Tarifs & catalogue, Utilisateurs, Paramètres | ✓ | | | |
 
 Pages d'arrivée : gérant → `/tableau-de-bord`, accueil → `/commandes`, atelier → `/production`, compta → `/factures`.
 
@@ -64,6 +70,7 @@ src/
   lib/format.ts         formaterMontant() et autres mises en forme fr-FR
   lib/libelles.ts       libellés français des ENUM SQL (techniques, unités, catégories…)
   lib/referentiels.ts   CRUD générique des tables de référence (lister, enregistrer, supprimer)
+  lib/tarifs.ts         calculerPrix() : prix de vente d’un produit selon sa grille
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
   components/           Chargement, Fenetre (modale <dialog>),
                         Referentiel (liste groupée + fiche pilotée par des ChampFiche)
@@ -73,7 +80,7 @@ src/
   auth/roles.ts         menu et droits par rôle
   layouts/AppLayout.tsx barre latérale (tiroir sur mobile) + en-tête
   pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte, Parametres,
-                        Catalogue (onglets machines / supports / finitions),
+                        Catalogue (onglets produits & prix / finitions / supports / machines), Produits,
                         EnConstruction (modules à venir)
   styles.css            CSS simple avec variables (thème clair/sombre), pas de framework CSS
 sql/                    compléments au schéma, numérotés
@@ -121,6 +128,6 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 1 : projet, connexion Supabase, page de connexion, navigation selon le rôle
 - [x] Étape 2 : gestion des utilisateurs (création, activation, rôle, mot de passe) + « Mon compte »
 - [x] Étape 3 : Paramètres (coordonnées, devise, TVA, marge, délais, mentions des documents)
-- [x] Étape 4 : Machines & tarifs (machines selon la technique, supports, finitions)
+- [x] Étape 4 : Tarifs & catalogue (produits avec grille de prix et paliers, finitions, supports, machines simplifiées)
 - [ ] Modules métier (clients, devis avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)
