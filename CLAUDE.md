@@ -88,10 +88,11 @@ src/
   lib/stock.ts          articles, mouvements (entrée / sortie / ajustement), alertes, variation()
   lib/commandes.ts      commandes, BAT, file de production, totalCommande(), enRetard()
   lib/factures.ts       factures, paiements, impayés (vue v_impayes), resteAPayer()
+  lib/tableauDeBord.ts  indicateurs par rôle (chaque bloc indépendant : RLS ou module absent n'empêche pas les autres)
   lib/depenses.ts       dépenses, catégories, modes de paiement, enregistrerDepense()
   lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
-  components/           Chargement, Fenetre (modale <dialog>),
+  components/           Chargement, Fenetre (modale <dialog>), GraphiqueFinances (colonnes encaissé / dépenses),
                         Referentiel : recherche sans accents (texteRecherche), peutSupprimer, saisie email/tel,
                         Referentiel (liste groupée + fiche pilotée par des ChampFiche)
   auth/AuthProvider.tsx session + profil (table profils), connexion / déconnexion
@@ -188,6 +189,14 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
   Suppression d'un paiement : gérant. L'acompte de la commande est enregistré en paiement « Acompte versé à la commande … ».
 - Impression comme le devis (demi-page A4 par défaut) : déjà réglé, reste à payer, « Arrêtée la présente facture… ».
 
+## Tableau de bord et graphiques
+
+- Gérant / compta : facturé, encaissé, dépenses, **résultat = encaissé − dépenses** (trésorerie du mois), reste à encaisser,
+  graphique 6 mois. Tous : « À surveiller » (retards, bloqués, impayés, stock bas, à livrer, BAT, devis). Atelier : aucun montant.
+- Graphiques : skill dataviz. Couleurs `--serie-1` (bleu) / `--serie-2` (orange) validées clair et sombre
+  (`validate_palette.js`) ; une seule échelle, légende, info-bulle au survol, tableau « Voir les valeurs ».
+  Le SVG suit la largeur réelle du conteneur (ResizeObserver) pour rester lisible sur téléphone.
+
 ## Commandes
 
 ```bash
@@ -220,5 +229,6 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 8 : Stock (quantités, alertes, valeur, historique, sorties, entrées, inventaire)
 - [x] Étape 9 : Commandes, BAT et production (création depuis le devis, suivi automatique du statut)
 - [x] Étape 10 : Factures et paiements (depuis la commande, acompte déduit, impression, impayés)
+- [x] Étape 11 : Tableau de bord (chiffres du mois, résultat, alertes « À surveiller », graphique 6 mois)
 - [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)

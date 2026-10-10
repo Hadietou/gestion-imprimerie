@@ -14,6 +14,8 @@
   --attention-fond: #fffaeb;
   --succes: #067647;
   --succes-fond: #ecfdf3;
+  --serie-1: #2a78d6;
+  --serie-2: #eb6834;
   --rayon: 10px;
   --largeur-menu: 240px;
   color-scheme: light dark;
@@ -38,6 +40,8 @@
     --attention-fond: #33270c;
     --succes: #75e0a7;
     --succes-fond: #0b2b1d;
+    --serie-1: #3987e5;
+    --serie-2: #d95926;
   }
 }
 
@@ -707,6 +711,71 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .liste-paiements li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem; padding: 0.4rem 0; border-top: 1px solid var(--bordure); }
 .liste-paiements .bouton-fermer { margin-left: auto; }
 .doc-signature-seule { grid-template-columns: 1fr; width: 50%; margin-left: auto; }
+
+/* ---------- Tableau de bord ---------- */
+.tuiles-stat { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.75rem; }
+.stat { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.9rem 1rem; background: var(--surface); border: 1px solid var(--bordure); border-radius: 12px; color: var(--texte); text-decoration: none; }
+.stat-libelle { font-size: 0.82rem; color: var(--texte-doux); }
+.stat-valeur { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.stat-note { font-size: 0.8rem; color: var(--texte-doux); }
+.stat-resultat.positif .stat-note { color: var(--succes); }
+.stat-resultat.negatif .stat-note { color: var(--erreur); }
+.stat-lien:hover { border-color: var(--primaire); }
+.stat-lien .stat-note { color: var(--primaire); }
+
+.liste-alertes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.alerte-tdb { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 12px; border: 1px solid var(--bordure); border-left-width: 4px; background: var(--surface); color: var(--texte); text-decoration: none; min-height: 48px; }
+.alerte-tdb:hover { border-color: var(--primaire); }
+.alerte-icone { width: 1.6rem; text-align: center; font-size: 1.1rem; }
+.alerte-texte { flex: 1; }
+.alerte-fleche { color: var(--texte-doux); }
+.niveau-critique { border-left-color: var(--erreur); }
+.niveau-critique .alerte-icone { color: var(--erreur); }
+.niveau-attention { border-left-color: var(--attention); }
+.niveau-attention .alerte-icone { color: var(--attention); }
+.niveau-info { border-left-color: var(--primaire); }
+.niveau-info .alerte-icone { color: var(--primaire); }
+.rien-a-signaler { margin: 0; color: var(--succes); }
+
+/* Graphique encaissé / dépenses */
+.graphique { margin: 0.75rem 0 0; }
+.legende { display: flex; gap: 1.25rem; font-size: 0.85rem; color: var(--texte-doux); margin-bottom: 0.25rem; }
+.legende span, .info-bulle span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.cle { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.cle.serie-1 { background: var(--serie-1); }
+.cle.serie-2 { background: var(--serie-2); }
+.zone-graphique { position: relative; }
+.zone-graphique svg { display: block; max-width: 100%; overflow: visible; }
+.zone-graphique path.serie-1 { fill: var(--serie-1); }
+.zone-graphique path.serie-2 { fill: var(--serie-2); }
+.zone-graphique .attenue path { opacity: 0.35; }
+.zone-graphique .grille { stroke: var(--bordure); stroke-width: 1; }
+.zone-graphique .ligne-base { stroke: var(--texte-doux); stroke-width: 1; opacity: 0.5; }
+.zone-graphique .axe { fill: var(--texte-doux); font-size: 11px; font-variant-numeric: tabular-nums; }
+.zone-graphique .cible { fill: transparent; cursor: pointer; }
+.info-bulle {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.12);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
+.tableau-valeurs { margin-top: 0.5rem; font-size: 0.88rem; }
+.tableau-valeurs summary { cursor: pointer; color: var(--primaire); min-height: 32px; display: flex; align-items: center; }
+.tableau-valeurs table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+.tableau-valeurs th, .tableau-valeurs td { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--bordure); text-align: right; font-variant-numeric: tabular-nums; }
+.tableau-valeurs th:first-child, .tableau-valeurs thead th:first-child { text-align: left; }
+.tableau-valeurs thead th { color: var(--texte-doux); font-weight: 500; }
 
 /* ---------- Page Paramètres ---------- */
 .page-parametres { max-width: 900px; }
