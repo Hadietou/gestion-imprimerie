@@ -615,6 +615,54 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .mouvement .carte-corps { gap: 0.1rem; }
 .mouvement > strong { white-space: nowrap; }
 
+/* ---------- Commandes ---------- */
+.multiligne { white-space: pre-line; }
+.cmd-bat_envoye, .cmd-bat_valide { background: var(--primaire-doux); color: var(--primaire); border-color: transparent; }
+.cmd-en_production { background: var(--attention-fond); color: var(--attention); border-color: transparent; }
+.cmd-termine, .cmd-livre { background: var(--succes-fond); color: var(--succes); border-color: transparent; }
+.cmd-annule { background: var(--erreur-fond); color: var(--erreur); border-color: transparent; }
+.prod-en_cours { background: var(--attention-fond); color: var(--attention); border-color: transparent; }
+.prod-termine { background: var(--succes-fond); color: var(--succes); border-color: transparent; }
+.prod-bloque { background: var(--erreur-fond); color: var(--erreur); border-color: transparent; }
+
+.etapes { list-style: none; display: flex; gap: 0.25rem; margin: 0 0 1rem; padding: 0; overflow-x: auto; }
+.etapes li {
+  flex: 1;
+  min-width: 6.5rem;
+  padding: 0.5rem 0.4rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--texte-doux);
+  border-bottom: 3px solid var(--bordure);
+  white-space: nowrap;
+}
+.etapes li.faite { color: var(--succes); border-bottom-color: var(--succes); }
+.etapes li.courante { color: var(--primaire); border-bottom-color: var(--primaire); font-weight: 700; }
+
+.infos-commande { margin: 0.75rem 0; }
+.champ-date { width: auto; min-height: 36px; padding: 0.3rem 0.5rem; }
+.section-bat { margin: 1rem 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.formulaire-bat { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem; }
+.formulaire-bat label { flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; font-weight: 500; }
+.section-bat .bouton-discret { align-self: flex-start; color: var(--primaire); }
+.liste-bat { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.liste-bat li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; padding: 0.5rem 0; border-top: 1px solid var(--bordure); }
+.commentaire-bat { flex-basis: 100%; font-style: italic; color: var(--texte-doux); }
+.barre-livraison { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--bordure); border-bottom: none; }
+
+/* ---------- Production (atelier) ---------- */
+.travail { display: flex; flex-direction: column; gap: 0.5rem; border-left-width: 4px; }
+.statut-travail-en_cours { border-left-color: var(--attention); }
+.statut-travail-bloque { border-left-color: var(--erreur); }
+.travail-entete { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; }
+.travail-commande { font-weight: 700; color: var(--primaire); text-decoration: none; }
+.travail-description { font-size: 1.05rem; }
+.travail-details { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: 0.9rem; }
+.travail-quantite { font-weight: 700; }
+.travail-consignes { margin: 0; padding: 0.5rem 0.75rem; border-radius: var(--rayon); background: var(--attention-fond); color: var(--attention); font-size: 0.9rem; }
+.travail-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--bordure); }
+.travail-actions select { width: auto; min-width: 10rem; }
+
 /* ---------- Page Paramètres ---------- */
 .page-parametres { max-width: 900px; }
 .titre-carte { font-size: 1.05rem; margin: 0; }

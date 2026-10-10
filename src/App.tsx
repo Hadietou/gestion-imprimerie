@@ -17,6 +17,8 @@ import Clients from './pages/Clients'
 import Devis from './pages/devis/Devis'
 import Depenses from './pages/Depenses'
 import Stock from './pages/Stock'
+import Commandes from './pages/commandes/Commandes'
+import Production from './pages/Production'
 import { ParametresProvider } from './parametres/ParametresProvider'
 
 // Pages réelles par chemin ; les autres entrées du MENU affichent « en construction »
@@ -29,6 +31,8 @@ const PAGES: Record<string, ReactNode> = {
   '/devis': <Devis />,
   '/depenses': <Depenses />,
   '/stock': <Stock />,
+  '/commandes': <Commandes />,
+  '/production': <Production />,
 }
 
 function RedirectionAccueil() {

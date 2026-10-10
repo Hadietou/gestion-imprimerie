@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import {
@@ -111,6 +111,8 @@ function Formulaire({
   const [erreurs, setErreurs] = useState<Record<string, string>>({})
   const [message, setMessage] = useState<string | null>(null)
   const [envoi, setEnvoi] = useState(false)
+  // Vrai : après l'enregistrement, ouvrir la création de la commande (commande directe au comptoir)
+  const creerCommandeApres = useRef(false)
 
   if (profil && !['gerant', 'accueil'].includes(profil.role)) {
     return <p className="alerte alerte-erreur">Seuls le gérant et l’accueil peuvent modifier les devis.</p>
@@ -165,7 +167,7 @@ function Formulaire({
         },
         lignes.map(versEnregistrement),
       )
-      navigate(`/devis/${nouvelId}`)
+      navigate(`/devis/${nouvelId}${creerCommandeApres.current ? '?commande=1' : ''}`)
     } catch (err) {
       setMessage((err as Error).message)
       setEnvoi(false)
@@ -286,7 +288,10 @@ function Formulaire({
         <button type="button" className="bouton" onClick={() => navigate(source && modification ? `/devis/${source.id}` : '/devis')}>
           Annuler
         </button>
-        <button type="submit" className="bouton bouton-principal" disabled={envoi}>
+        <button type="submit" className="bouton" disabled={envoi} onClick={() => (creerCommandeApres.current = true)}>
+          Enregistrer et créer la commande
+        </button>
+        <button type="submit" className="bouton bouton-principal" disabled={envoi} onClick={() => (creerCommandeApres.current = false)}>
           {envoi ? 'Enregistrement…' : 'Enregistrer le devis'}
         </button>
       </div>

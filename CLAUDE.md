@@ -27,6 +27,8 @@ Toute l'interface, les messages et le code métier (noms de variables, composant
     en une transaction ; SECURITY DEFINER avec contrôle gérant/accueil, car la RLS réserve la suppression de lignes au gérant).
   - `sql/07_depenses.sql` : `categories_depense`, `depenses`, `mouvements_stock.depense_id`, fonction `enregistrer_depense`
     (à la création d'un achat, chaque article entre en stock et son prix devient le dernier prix d'achat).
+  - `sql/08_commandes.sql` : `commandes.objet/remise_pct/taux_tva`, une commande active par devis,
+    `creer_commande_depuis_devis()`, déclencheurs : statut de commande suivant les BAT et l'atelier.
   - Ajout de valeur à un ENUM : script séparé, car PostgreSQL interdit d’utiliser la valeur dans la même exécution.
 - **Prix des devis = grille de prix de vente** (pratique du marché), PAS un calcul de coût machine.
   Chaque produit a un `mode_prix` (forfait, par unité, m², mètre linéaire, mille, par lot), un prix de base,
@@ -82,6 +84,7 @@ src/
                         prixProduitLigne() (minimum au m² par pièce), montantFinition()
   lib/devis.ts          accès aux devis, statuts, calculerTotaux() (même formule que recalculer_devis)
   lib/stock.ts          articles, mouvements (entrée / sortie / ajustement), alertes, variation()
+  lib/commandes.ts      commandes, BAT, file de production, totalCommande(), enRetard()
   lib/depenses.ts       dépenses, catégories, modes de paiement, enregistrerDepense()
   lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
@@ -98,6 +101,8 @@ src/
                         Clients (recherche, appel / e-mail en un clic),
   pages/Stock.tsx       liste (alertes, valeur), fiche article (historique, sortie, entrée, inventaire)
   pages/Depenses.tsx    mois par mois, totaux par catégorie, catégories (gérant) ; FicheDepense.tsx : saisie
+  pages/commandes/      Commandes (routes), ListeCommandes, FicheCommande (étapes, BAT, travaux, montants, livraison)
+  pages/Production.tsx  file de l'atelier (Démarrer / Terminé / Bloqué, machine)
   pages/devis/          Devis (routes), ListeDevis, FicheDevis (document + actions), EditeurDevis,
                         LigneDevis, ChoixClient, DocumentDevis (A4 imprimable), edition.ts (état des lignes)
                         EnConstruction (modules à venir)
@@ -155,6 +160,16 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
   Entrée par achat : module Dépenses. Inventaire : on saisit la quantité comptée, l'écart est enregistré en `ajustement` signé.
 - Valeur du stock (stock × dernier prix d'achat) visible du gérant et de la compta seulement.
 
+## Commandes, BAT, production
+
+- Une commande naît d'un devis : « ✓ Accepté — créer la commande » (fiche devis) ou « Enregistrer et créer la commande »
+  (éditeur → `/devis/:id?commande=1`). `creer_commande_depuis_devis` copie lignes, finitions (→ `instructions`), remise, TVA.
+- Statuts : attente_bat → bat_envoye → bat_valide → en_production → termine → livre (annule à part).
+  BAT envoyé / validé / refusé et avancement des lignes mettent le statut à jour **côté base** (déclencheurs) ;
+  l'interface ne pose à la main que : « Pas de BAT » (bat_valide), livrée, annulée, rétablie.
+- Atelier : file `/production` (lignes des commandes bat_valide / en_production non terminées) ; ne voit aucun prix.
+- Acompte saisi sur la commande ; « reste à payer » = total (TTC ou HT si sans TVA) − acompte.
+
 ## Commandes
 
 ```bash
@@ -185,5 +200,6 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 6 : Devis (grille de prix, finitions, remise client, TVA optionnelle, impression A4 / PDF, statuts)
 - [x] Étape 7 : Dépenses (catégories, mois, achats de fournitures qui entrent en stock, duplication)
 - [x] Étape 8 : Stock (quantités, alertes, valeur, historique, sorties, entrées, inventaire)
+- [x] Étape 9 : Commandes, BAT et production (création depuis le devis, suivi automatique du statut)
 - [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)
