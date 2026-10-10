@@ -511,40 +511,50 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .doc-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-top: 2mm; }
 .doc-signatures > div { min-height: 24mm; padding: 3mm; border: 1px dashed var(--doc-trait); border-radius: 2mm; display: flex; flex-direction: column; gap: 1mm; }
 
-/* Demi-page A4 (A5 : 148 × 210 mm) : format par défaut, mise en page resserrée */
-.document.format-a5 {
-  max-width: 148mm;
-  padding: 7mm 8mm 6mm;
-  font-size: 7.6pt;
-  line-height: 1.3;
-  gap: 2.6mm;
+/* Moitié haute d'une feuille A4 (210 × 148,5 mm) : format par défaut, en-tête sur une bande */
+.document.format-demi {
+  max-width: 210mm;
+  height: 148.5mm;
+  padding: 6mm 9mm 5mm;
+  font-size: 7.4pt;
+  line-height: 1.28;
+  gap: 2.2mm;
 }
-.format-a5 .doc-entete { padding-bottom: 2mm; gap: 4mm; border-bottom-width: 1.5px; }
-.format-a5 .doc-emetteur h2 { font-size: 10.5pt; margin-bottom: 0.5mm; }
-.format-a5 .doc-titre h1 { font-size: 14pt; }
-.format-a5 .doc-numero { font-size: 8.5pt; }
-.format-a5 .doc-client { padding: 1.8mm 2.5mm; min-width: 52%; border-radius: 1.5mm; }
-.format-a5 .doc-etiquette { font-size: 6.2pt; }
-.format-a5 .doc-petit, .format-a5 .doc-detail { font-size: 6.6pt; }
-.format-a5 .doc-table th { font-size: 6.4pt; padding: 1.2mm 1.6mm; }
-.format-a5 .doc-table td { padding: 1.2mm 1.6mm; }
-.format-a5 .doc-bas { gap: 4mm; }
-.format-a5 .doc-lettres { font-size: 7.4pt; }
-.format-a5 .doc-totaux { min-width: 52mm; }
-.format-a5 .doc-totaux th, .format-a5 .doc-totaux td { padding-top: 0.6mm; padding-bottom: 0.6mm; }
-.format-a5 .doc-total-final th, .format-a5 .doc-total-final td { font-size: 9pt; padding-top: 1.2mm; }
-.format-a5 .doc-texte { gap: 0.2mm; }
-.format-a5 .doc-signatures { gap: 4mm; margin-top: 0; }
-.format-a5 .doc-signatures > div { min-height: 15mm; padding: 1.6mm 2mm; }
+.format-demi .doc-entete { display: grid; grid-template-columns: 1fr 1.05fr auto; align-items: start; gap: 4mm; padding-bottom: 2mm; border-bottom-width: 1.5px; }
+.format-demi .doc-emetteur h2 { font-size: 10.5pt; margin-bottom: 0.4mm; }
+.format-demi .doc-client { margin: 0; min-width: 0; padding: 1.6mm 2.4mm; border-radius: 1.5mm; }
+.format-demi .doc-titre h1 { font-size: 15pt; }
+.format-demi .doc-numero { font-size: 8.4pt; }
+.format-demi .doc-etiquette { font-size: 6pt; }
+.format-demi .doc-petit, .format-demi .doc-detail { font-size: 6.4pt; }
+.format-demi .doc-table th { font-size: 6.2pt; padding: 1mm 1.6mm; }
+.format-demi .doc-table td { padding: 0.9mm 1.6mm; }
+.format-demi .doc-bas { gap: 6mm; }
+.format-demi .doc-lettres { font-size: 7.2pt; gap: 0.5mm; }
+.format-demi .doc-totaux { min-width: 58mm; }
+.format-demi .doc-totaux th, .format-demi .doc-totaux td { padding-top: 0.4mm; padding-bottom: 0.4mm; }
+.format-demi .doc-total-final th, .format-demi .doc-total-final td { font-size: 8.8pt; padding-top: 1mm; }
+/* Remarques / conditions / règlement : une ligne chacun, libellé en tête */
+.format-demi .doc-texte { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 1.5mm; }
+.format-demi .doc-texte .doc-ligne-texte { display: inline; }
+.format-demi .doc-texte .doc-ligne-texte + .doc-ligne-texte::before { content: ' — '; }
+.format-demi .doc-signatures { gap: 6mm; margin-top: auto; }
+.format-demi .doc-signatures > div { min-height: 13mm; padding: 1.4mm 2mm; }
+
+/* Écran : trait de coupe sous la demi-page */
+.feuille-demi .document { border-bottom: 1px dashed #9aa3b5; }
 
 .choix-format { margin: 0; }
 
+/* Petit écran : la demi-page garde sa taille réelle (défilement horizontal) ; la page entière se réorganise */
+.feuille { overflow-x: auto; }
+.feuille-demi .document { min-width: 210mm; }
 @media screen and (max-width: 720px) {
-  .document { padding: 6mm; font-size: 9.5pt; }
-  .doc-entete, .doc-bas { flex-direction: column; }
-  .doc-titre { align-items: flex-start; text-align: left; }
-  .doc-client { min-width: 0; margin-left: 0; }
-  .doc-signatures { grid-template-columns: 1fr; }
+  .document.format-a4 { padding: 6mm; font-size: 9.5pt; }
+  .format-a4 .doc-entete, .format-a4 .doc-bas { flex-direction: column; }
+  .format-a4 .doc-titre { align-items: flex-start; text-align: left; }
+  .format-a4 .doc-client { min-width: 0; margin-left: 0; }
+  .format-a4 .doc-signatures { grid-template-columns: 1fr; }
 }
 
 /* ---------- Impression : seul le document sort ---------- */
@@ -555,7 +565,10 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
   .contenu { margin: 0 !important; }
   .page { padding: 0 !important; }
   .document { box-shadow: none; border-radius: 0; max-width: none; width: 210mm; padding: 12mm 14mm; }
-  .document.format-a5 { width: 148mm; padding: 7mm 8mm 6mm; }
+  .document.format-demi { width: 210mm; height: 148.5mm; padding: 6mm 9mm 5mm; overflow: hidden; }
+  .feuille { max-width: none; overflow: visible; }
+  /* Trait de coupe au milieu de la feuille */
+  .feuille-demi .document { border-bottom: 0.3mm dashed #b8bfcc; }
   .doc-table tr, .doc-bas, .doc-signatures, .doc-texte { break-inside: avoid; }
   .doc-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .doc-table tbody tr:nth-child(even) td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }

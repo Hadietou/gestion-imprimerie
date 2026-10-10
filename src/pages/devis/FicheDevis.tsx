@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import {
@@ -11,7 +11,12 @@ import {
   type StatutDevis,
 } from '../../lib/devis'
 import { useParametres } from '../../parametres/ParametresContext'
-import DocumentDevis, { type FormatDocument } from './DocumentDevis'
+import DocumentDevis from './DocumentDevis'
+
+// demi : moitié haute d'une feuille A4, découpée ensuite au milieu ; A4 : page entière
+type Impression = 'demi' | 'A4'
+const HAUTEUR_DEMI_PAGE_MM = 148.5
+const PX_PAR_MM = 96 / 25.4
 
 // Fiche d'un devis : document imprimable + actions (statut, modifier, dupliquer…)
 
@@ -24,8 +29,10 @@ export default function FicheDevis() {
   const [erreur, setErreur] = useState<string | null>(null)
   const [action, setAction] = useState(false)
   const [version, setVersion] = useState(0)
-  // Demi-page A4 (A5) sauf choix contraire pour ce devis
-  const [format, setFormat] = useState<FormatDocument>('A5')
+  // Moitié haute d'une feuille A4, sauf choix contraire pour ce devis
+  const [impression, setImpression] = useState<Impression>('demi')
+  const [depasse, setDepasse] = useState(false)
+  const zoneDocument = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let actuel = true
@@ -47,13 +54,15 @@ export default function FicheDevis() {
     }
   }, [devis])
 
-  // Format de la feuille pour l'impression / le PDF
+  // Le devis tient-il dans la demi-page ? (mesuré en continu sur le document affiché)
   useEffect(() => {
-    const style = document.createElement('style')
-    style.textContent = `@page { size: ${format}; margin: 0; }`
-    document.head.appendChild(style)
-    return () => style.remove()
-  }, [format])
+    const doc = zoneDocument.current?.querySelector<HTMLElement>('.document')
+    if (!doc || impression === 'A4') return
+    // Hauteur fixe de 148,5 mm : scrollHeight inclut ce qui déborde
+    const observateur = new ResizeObserver(() => setDepasse(doc.scrollHeight / PX_PAR_MM > HAUTEUR_DEMI_PAGE_MM + 0.5))
+    observateur.observe(doc)
+    return () => observateur.disconnect()
+  }, [impression, devis])
 
   if (erreur) return <p className="alerte alerte-erreur" role="alert">{erreur}</p>
   if (!devis || !parametres) return <p className="texte-doux">Chargement…</p>
@@ -96,12 +105,22 @@ export default function FicheDevis() {
         <span className={`badge badge-statut statut-${statut}`}>{LIBELLES_STATUTS_DEVIS[statut]}</span>
         <span className="espace" />
         <div className="pastilles filtres choix-format" role="group" aria-label="Format d’impression">
-          <button type="button" className={`pastille ${format === 'A5' ? 'selectionne' : ''}`} aria-pressed={format === 'A5'} onClick={() => setFormat('A5')}>
-            Demi-page (A5)
-          </button>
-          <button type="button" className={`pastille ${format === 'A4' ? 'selectionne' : ''}`} aria-pressed={format === 'A4'} onClick={() => setFormat('A4')}>
-            Page entière (A4)
-          </button>
+          {(
+            [
+              ['demi', 'Demi-page A4'],
+              ['A4', 'Page entière'],
+            ] as const
+          ).map(([valeur, libelle]) => (
+            <button
+              key={valeur}
+              type="button"
+              className={`pastille ${impression === valeur ? 'selectionne' : ''}`}
+              aria-pressed={impression === valeur}
+              onClick={() => setImpression(valeur)}
+            >
+              {libelle}
+            </button>
+          ))}
         </div>
         <button type="button" className="bouton bouton-principal" onClick={() => window.print()}>
           Imprimer / PDF
@@ -151,7 +170,15 @@ export default function FicheDevis() {
 
       {erreur && <p className="alerte alerte-erreur no-print" role="alert">{erreur}</p>}
 
-      <DocumentDevis devis={devis} parametres={parametres} format={format} />
+      {impression !== 'A4' && depasse && (
+        <p className="alerte alerte-attention no-print" role="status">
+          Ce devis dépasse la demi-page : choisissez « Page entière » pour l’imprimer.
+        </p>
+      )}
+
+      <div ref={zoneDocument} className={`feuille feuille-${impression}`}>
+        <DocumentDevis devis={devis} parametres={parametres} format={impression} />
+      </div>
     </>
   )
 }

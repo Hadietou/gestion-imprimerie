@@ -22,18 +22,19 @@ function Lignes({ texte }: { texte: string | null | undefined }) {
   )
 }
 
-export type FormatDocument = 'A5' | 'A4'
+/** demi : moitié haute d'une feuille A4 (par défaut) ; A4 : page entière */
+export type FormatDocument = 'demi' | 'A4'
 
 export default function DocumentDevis({
   devis,
   parametres: p,
-  format = 'A5',
+  format = 'demi',
 }: {
   devis: DevisComplet
   parametres: Parametres
-  /** A5 = demi-page A4 (par défaut), A4 = page entière */
   format?: FormatDocument
 }) {
+  const compact = format === 'demi'
   const devise = p.devise
   const lignes = [...devis.lignes].sort((a, b) => a.ordre - b.ordre)
   const totaux = calculerTotaux(
@@ -45,8 +46,20 @@ export default function DocumentDevis({
   const montantFinal = avecTva ? totaux.totalTtc : totaux.totalHt
   const c = devis.client
 
+  // En demi-page, le client se place dans la bande d'en-tête pour gagner de la hauteur
+  const blocClient = (
+    <section className="doc-client">
+      <span className="doc-etiquette">Client</span>
+      <strong>{c.nom}</strong>
+      {c.contact && <span>À l’attention de : {c.contact}</span>}
+      <Lignes texte={c.adresse} />
+      {c.telephone && <span>Tél. : {c.telephone}</span>}
+      {c.numero_fiscal && <span>NIF : {c.numero_fiscal}</span>}
+    </section>
+  )
+
   return (
-    <article className={`document format-${format.toLowerCase()}`} aria-label={`Devis ${devis.numero}`}>
+    <article className={`document ${compact ? 'format-demi' : 'format-a4'}`} aria-label={`Devis ${devis.numero}`}>
       <header className="doc-entete">
         <div className="doc-emetteur">
           <h2>{p.nom_imprimerie}</h2>
@@ -61,6 +74,7 @@ export default function DocumentDevis({
             </span>
           )}
         </div>
+        {compact && blocClient}
         <div className="doc-titre">
           <h1>DEVIS</h1>
           <span className="doc-numero">N° {devis.numero}</span>
@@ -69,14 +83,7 @@ export default function DocumentDevis({
         </div>
       </header>
 
-      <section className="doc-client">
-        <span className="doc-etiquette">Client</span>
-        <strong>{c.nom}</strong>
-        {c.contact && <span>À l’attention de : {c.contact}</span>}
-        <Lignes texte={c.adresse} />
-        {c.telephone && <span>Tél. : {c.telephone}</span>}
-        {c.numero_fiscal && <span>NIF : {c.numero_fiscal}</span>}
-      </section>
+      {!compact && blocClient}
 
       {devis.objet && (
         <p className="doc-objet">
