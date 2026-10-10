@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import {
   ETAPES_COMMANDE,
@@ -14,6 +14,7 @@ import {
   type Commande,
   type StatutCommande,
 } from '../../lib/commandes'
+import { creerFactureDepuisCommande, factureDeCommande } from '../../lib/factures'
 import { formaterMontant } from '../../lib/format'
 import { LIBELLES_TECHNIQUES } from '../../lib/libelles'
 import { useParametres } from '../../parametres/ParametresContext'
@@ -36,13 +37,16 @@ export default function FicheCommande() {
   const [version, setVersion] = useState(0)
   const [lienBat, setLienBat] = useState('')
   const [acompte, setAcompte] = useState<string | null>(null)
+  const [facture, setFacture] = useState<{ id: number; numero: string } | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     let actuel = true
-    chargerCommande(Number(id))
-      .then((c) => {
+    Promise.all([chargerCommande(Number(id)), factureDeCommande(Number(id)).catch(() => null)])
+      .then(([c, f]) => {
         if (!actuel) return
         setCommande(c)
+        setFacture(f)
         setErreur(null)
       })
       .catch((e: Error) => actuel && setErreur(e.message))
@@ -73,6 +77,21 @@ export default function FicheCommande() {
     } catch (e) {
       setErreur((e as Error).message)
     } finally {
+      setAction(false)
+    }
+  }
+
+  const peutFacturer = (role === 'gerant' || role === 'compta' || role === 'accueil') && c.statut !== 'annule' && !facture
+
+  async function facturer() {
+    if (c.statut !== 'livre' && c.statut !== 'termine' && !confirm('La commande n’est pas encore terminée. Créer la facture maintenant ?')) return
+    setAction(true)
+    setErreur(null)
+    try {
+      const idFacture = await creerFactureDepuisCommande(c.id)
+      navigate(`/factures/${idFacture}`)
+    } catch (e) {
+      setErreur((e as Error).message)
       setAction(false)
     }
   }
@@ -117,6 +136,16 @@ export default function FicheCommande() {
         {c.urgent && <span className="badge statut-refuse">🔥 Urgent</span>}
         {enRetard(c) && <span className="badge statut-refuse">⚠ En retard</span>}
         <span className="espace" />
+        {facture && role !== 'atelier' && (
+          <Link to={`/factures/${facture.id}`} className="bouton bouton-succes">
+            🧾 Facture {facture.numero} →
+          </Link>
+        )}
+        {peutFacturer && (
+          <button type="button" className="bouton bouton-principal" disabled={action} onClick={facturer}>
+            🧾 Créer la facture
+          </button>
+        )}
         {active && role !== 'compta' && (
           <Link to="/production" className="bouton">
             File de production

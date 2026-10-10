@@ -696,6 +696,18 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .travail-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--bordure); }
 .travail-actions select { width: auto; min-width: 10rem; }
 
+/* ---------- Factures ---------- */
+.fac-emise { background: var(--attention-fond); color: var(--attention); border-color: transparent; }
+.fac-partiellement_payee { background: var(--primaire-doux); color: var(--primaire); border-color: transparent; }
+.fac-payee { background: var(--succes-fond); color: var(--succes); border-color: transparent; }
+.fac-annulee { background: var(--erreur-fond); color: var(--erreur); border-color: transparent; }
+.resume-paiement { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+.resume-paiement > .bouton { align-self: flex-start; }
+.liste-paiements { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.liste-paiements li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1rem; padding: 0.4rem 0; border-top: 1px solid var(--bordure); }
+.liste-paiements .bouton-fermer { margin-left: auto; }
+.doc-signature-seule { grid-template-columns: 1fr; width: 50%; margin-left: auto; }
+
 /* ---------- Page Paramètres ---------- */
 .page-parametres { max-width: 900px; }
 .titre-carte { font-size: 1.05rem; margin: 0; }

@@ -29,6 +29,8 @@ Toute l'interface, les messages et le code métier (noms de variables, composant
     (à la création d'un achat, chaque article entre en stock et son prix devient le dernier prix d'achat).
   - `sql/08_commandes.sql` : `commandes.objet/remise_pct/taux_tva`, une commande active par devis,
     `creer_commande_depuis_devis()`, déclencheurs : statut de commande suivant les BAT et l'atelier.
+  - `sql/09_factures.sql` : une facture active par commande, `creer_facture_depuis_commande()` (gérant, compta, **accueil**),
+    échéance = date + `delai_paiement_j`, acompte de la commande → premier paiement.
   - Ajout de valeur à un ENUM : script séparé, car PostgreSQL interdit d’utiliser la valeur dans la même exécution.
 - **Prix des devis = grille de prix de vente** (pratique du marché), PAS un calcul de coût machine.
   Chaque produit a un `mode_prix` (forfait, par unité, m², mètre linéaire, mille, par lot), un prix de base,
@@ -85,6 +87,7 @@ src/
   lib/devis.ts          accès aux devis, statuts, calculerTotaux() (même formule que recalculer_devis)
   lib/stock.ts          articles, mouvements (entrée / sortie / ajustement), alertes, variation()
   lib/commandes.ts      commandes, BAT, file de production, totalCommande(), enRetard()
+  lib/factures.ts       factures, paiements, impayés (vue v_impayes), resteAPayer()
   lib/depenses.ts       dépenses, catégories, modes de paiement, enregistrerDepense()
   lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
@@ -102,6 +105,8 @@ src/
   pages/Stock.tsx       liste (alertes, valeur), fiche article (historique, sortie, entrée, inventaire)
   pages/Depenses.tsx    mois par mois, totaux par catégorie, catégories (gérant) ; FicheDepense.tsx : saisie
   pages/commandes/      Commandes (routes), ListeCommandes, FicheCommande (étapes, BAT, travaux, montants, livraison)
+  pages/factures/       Factures (routes), ListeFactures, FicheFacture (paiements), DocumentFacture (A4 / demi-page)
+  pages/Impayes.tsx     factures non soldées, retard, appel du client
   pages/Production.tsx  file de l'atelier (Démarrer / Terminé / Bloqué, machine)
   pages/devis/          Devis (routes), ListeDevis, FicheDevis (document + actions), EditeurDevis,
                         LigneDevis, ChoixClient, DocumentDevis (A4 imprimable), edition.ts (état des lignes)
@@ -175,6 +180,14 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 - Atelier : file `/production` (lignes des commandes bat_valide / en_production non terminées) ; ne voit aucun prix.
 - Acompte saisi sur la commande ; « reste à payer » = total (TTC ou HT si sans TVA) − acompte.
 
+## Factures et paiements
+
+- Une facture naît d'une commande (« 🧾 Créer la facture » sur la fiche commande) ; ses produits = lignes de la commande,
+  `notes` = objet. Créée directement « À payer » (`emise`). Annulation : gérant et compta ; refacturation possible ensuite.
+- `montant_paye` et statut (À payer → Payée en partie → Payée) suivent la table `paiements` (déclencheur du schéma).
+  Suppression d'un paiement : gérant. L'acompte de la commande est enregistré en paiement « Acompte versé à la commande … ».
+- Impression comme le devis (demi-page A4 par défaut) : déjà réglé, reste à payer, « Arrêtée la présente facture… ».
+
 ## Commandes
 
 ```bash
@@ -206,5 +219,6 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 7 : Dépenses (catégories, mois, achats de fournitures qui entrent en stock, duplication)
 - [x] Étape 8 : Stock (quantités, alertes, valeur, historique, sorties, entrées, inventaire)
 - [x] Étape 9 : Commandes, BAT et production (création depuis le devis, suivi automatique du statut)
+- [x] Étape 10 : Factures et paiements (depuis la commande, acompte déduit, impression, impayés)
 - [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)
