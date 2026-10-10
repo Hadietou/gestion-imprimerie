@@ -125,7 +125,9 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 - Ligne libre = `produit_id` NULL, prix toujours saisi. Dimensions saisies en cm, stockées en mm.
 - **TVA optionnelle par devis** : case « Appliquer la TVA » ; décochée → `taux_tva = 0`, le document affiche « Total à payer » HT.
 - Modifiable en brouillon / envoyé ; accepté / refusé → lecture seule (« Rouvrir » ou « Dupliquer »). Compta : lecture seule.
-- Impression : `window.print()`, styles `@media print` (seul `.document` sort) ; le titre de la page = nom du PDF.
+- Impression : **demi-page A4 (A5) par défaut**, « Page entière (A4) » au choix sur la fiche ; `@page` injecté selon le format.
+  `window.print()`, styles `@media print` (seul `.document` sort) ; le titre de la page = nom du PDF.
+  Les règles « petit écran » du document sont en `@media screen` (une feuille A5 fait moins de 720 px de large).
 
 ## Commandes
 

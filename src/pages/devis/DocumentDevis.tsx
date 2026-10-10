@@ -22,7 +22,18 @@ function Lignes({ texte }: { texte: string | null | undefined }) {
   )
 }
 
-export default function DocumentDevis({ devis, parametres: p }: { devis: DevisComplet; parametres: Parametres }) {
+export type FormatDocument = 'A5' | 'A4'
+
+export default function DocumentDevis({
+  devis,
+  parametres: p,
+  format = 'A5',
+}: {
+  devis: DevisComplet
+  parametres: Parametres
+  /** A5 = demi-page A4 (par défaut), A4 = page entière */
+  format?: FormatDocument
+}) {
   const devise = p.devise
   const lignes = [...devis.lignes].sort((a, b) => a.ordre - b.ordre)
   const totaux = calculerTotaux(
@@ -35,7 +46,7 @@ export default function DocumentDevis({ devis, parametres: p }: { devis: DevisCo
   const c = devis.client
 
   return (
-    <article className="document" aria-label={`Devis ${devis.numero}`}>
+    <article className={`document format-${format.toLowerCase()}`} aria-label={`Devis ${devis.numero}`}>
       <header className="doc-entete">
         <div className="doc-emetteur">
           <h2>{p.nom_imprimerie}</h2>

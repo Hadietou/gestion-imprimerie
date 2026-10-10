@@ -11,7 +11,7 @@ import {
   type StatutDevis,
 } from '../../lib/devis'
 import { useParametres } from '../../parametres/ParametresContext'
-import DocumentDevis from './DocumentDevis'
+import DocumentDevis, { type FormatDocument } from './DocumentDevis'
 
 // Fiche d'un devis : document imprimable + actions (statut, modifier, dupliquer…)
 
@@ -24,6 +24,8 @@ export default function FicheDevis() {
   const [erreur, setErreur] = useState<string | null>(null)
   const [action, setAction] = useState(false)
   const [version, setVersion] = useState(0)
+  // Demi-page A4 (A5) sauf choix contraire pour ce devis
+  const [format, setFormat] = useState<FormatDocument>('A5')
 
   useEffect(() => {
     let actuel = true
@@ -44,6 +46,14 @@ export default function FicheDevis() {
       document.title = titre
     }
   }, [devis])
+
+  // Format de la feuille pour l'impression / le PDF
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = `@page { size: ${format}; margin: 0; }`
+    document.head.appendChild(style)
+    return () => style.remove()
+  }, [format])
 
   if (erreur) return <p className="alerte alerte-erreur" role="alert">{erreur}</p>
   if (!devis || !parametres) return <p className="texte-doux">Chargement…</p>
@@ -85,6 +95,14 @@ export default function FicheDevis() {
         </Link>
         <span className={`badge badge-statut statut-${statut}`}>{LIBELLES_STATUTS_DEVIS[statut]}</span>
         <span className="espace" />
+        <div className="pastilles filtres choix-format" role="group" aria-label="Format d’impression">
+          <button type="button" className={`pastille ${format === 'A5' ? 'selectionne' : ''}`} aria-pressed={format === 'A5'} onClick={() => setFormat('A5')}>
+            Demi-page (A5)
+          </button>
+          <button type="button" className={`pastille ${format === 'A4' ? 'selectionne' : ''}`} aria-pressed={format === 'A4'} onClick={() => setFormat('A4')}>
+            Page entière (A4)
+          </button>
+        </div>
         <button type="button" className="bouton bouton-principal" onClick={() => window.print()}>
           Imprimer / PDF
         </button>
@@ -133,7 +151,7 @@ export default function FicheDevis() {
 
       {erreur && <p className="alerte alerte-erreur no-print" role="alert">{erreur}</p>}
 
-      <DocumentDevis devis={devis} parametres={parametres} />
+      <DocumentDevis devis={devis} parametres={parametres} format={format} />
     </>
   )
 }
