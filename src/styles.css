@@ -457,7 +457,33 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .prix-ligne strong { font-size: 1.1rem; }
 .prix-ligne .champ-suffixe input { max-width: 140px; font-weight: 600; }
 .prix-ligne .bouton-discret { color: var(--primaire); }
-.ajout-ligne { margin-top: 0.75rem; border-style: dashed; width: 100%; }
+/* Bouton « Ajouter un autre produit » : bien visible sous le dernier produit */
+.ajout-ligne {
+  margin-top: 0.75rem;
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border: 2px dashed var(--primaire);
+  background: var(--primaire-doux);
+  color: var(--primaire);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.ajout-ligne:hover { background: var(--primaire); color: var(--primaire-texte); border-style: solid; }
+.ajout-ligne-plus {
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--primaire);
+  color: var(--primaire-texte);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.ajout-ligne:hover .ajout-ligne-plus { background: var(--primaire-texte); color: var(--primaire); }
+.objet-auto { margin: 0; padding: 0.6rem 0.75rem; border-radius: var(--rayon); background: var(--fond); border: 1px solid var(--bordure); font-weight: 500; }
 
 .totaux { display: grid; grid-template-columns: 1fr auto; gap: 0.35rem 1.5rem; margin: 1.25rem 0 0 auto; max-width: 360px; }
 .totaux dt { color: var(--texte-doux); }

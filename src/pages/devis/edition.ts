@@ -176,3 +176,21 @@ export function versEnregistrement(l: LigneEdition): LigneAEnregistrer {
     finitions: l.finitions.map((f) => ({ finition_id: f.finition_id, quantite: 1, montant: forcee ? 0 : f.montant })),
   }
 }
+
+/**
+ * Objet du devis, résumé automatiquement à partir des produits :
+ * « Carte de visite 85×55 R/V × 500, Bâche frontlit 440 g × 2 et 1 autre »
+ */
+export function resumerObjet(lignes: LigneEdition[], maxProduits = 3): string {
+  const elements = lignes
+    .filter((l) => l.produit_id !== null || l.libre)
+    .map((l) => {
+      const nom = l.description.split('\n')[0].trim()
+      const q = versNombre(l.quantite)
+      return nom ? (q > 1 ? `${nom} × ${q.toLocaleString('fr-FR')}` : nom) : ''
+    })
+    .filter(Boolean)
+  if (elements.length <= maxProduits) return elements.join(', ')
+  const reste = elements.length - maxProduits
+  return `${elements.slice(0, maxProduits).join(', ')} et ${reste} autre${reste > 1 ? 's' : ''}`
+}

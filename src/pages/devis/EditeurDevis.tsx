@@ -12,7 +12,16 @@ import { formaterMontant } from '../../lib/format'
 import type { Client, Finition, Produit } from '../../lib/types'
 import { useParametres } from '../../parametres/ParametresContext'
 import ChoixClient from './ChoixClient'
-import { erreurLigne, ligneVide, lignesDepuisDevis, totalLigne, versEnregistrement, versNombre, type LigneEdition } from './edition'
+import {
+  erreurLigne,
+  ligneVide,
+  lignesDepuisDevis,
+  resumerObjet,
+  totalLigne,
+  versEnregistrement,
+  versNombre,
+  type LigneEdition,
+} from './edition'
 import LigneDevis from './LigneDevis'
 
 interface Referentiels {
@@ -100,7 +109,6 @@ function Formulaire({
       : referentiels.clients
 
   const [client, setClient] = useState<Client | null>(source ? source.client : null)
-  const [objet, setObjet] = useState(source?.objet ?? '')
   const [date, setDate] = useState(modification && source ? source.date_devis : aujourdhui())
   const [validite, setValidite] = useState(String(source?.validite_jours ?? validiteDefaut))
   const [remise, setRemise] = useState(texte(source?.remise_pct ?? 0))
@@ -121,6 +129,8 @@ function Formulaire({
   const remisePct = Math.min(Math.max(versNombre(remise) || 0, 0), 100)
   const tauxTva = tvaActive ? Math.max(versNombre(taux) || 0, 0) : 0
   const totaux = calculerTotaux(lignes.map(totalLigne), remisePct, tauxTva)
+  // Objet du devis : résumé automatique des produits saisis
+  const objetAuto = resumerObjet(lignes)
 
   function choisirClient(c: Client | null) {
     setClient(c)
@@ -160,7 +170,7 @@ function Formulaire({
           client_id: client!.id,
           date_devis: date,
           validite_jours: jours,
-          objet: objet.trim(),
+          objet: objetAuto,
           remise_pct: remisePct,
           taux_tva: tauxTva,
           notes: notes.trim(),
@@ -189,10 +199,12 @@ function Formulaire({
             </span>
             <ChoixClient clients={clients} client={client} onChange={choisirClient} erreur={erreurs.client} />
           </div>
-          <label className="champ-large" htmlFor="objet">
-            <span>Objet</span>
-            <input id="objet" placeholder="Ex. Supports de communication salon 2026" value={objet} onChange={(e) => setObjet(e.target.value)} />
-          </label>
+          <div className="champ-large champ-personnalise">
+            <span className="libelle-champ">Objet (résumé automatique des produits)</span>
+            <p className={`objet-auto ${objetAuto ? '' : 'texte-doux'}`}>
+              {objetAuto || 'Se remplit tout seul avec les produits ajoutés ci-dessous.'}
+            </p>
+          </div>
           <label htmlFor="date">
             <span>Date du devis</span>
             <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -231,7 +243,10 @@ function Formulaire({
         </ol>
         {erreurs.lignes && <p className="texte-erreur petit">{erreurs.lignes}</p>}
         <button type="button" className="bouton ajout-ligne" onClick={() => setLignes((ls) => [...ls, ligneVide()])}>
-          + Ajouter un produit
+          <span className="ajout-ligne-plus" aria-hidden="true">
+            +
+          </span>
+          {lignes.length === 0 ? 'Ajouter un produit' : 'Ajouter un autre produit'}
         </button>
       </section>
 

@@ -134,6 +134,8 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 - Routes : `/devis` liste, `/devis/nouveau` (`?copie=ID` pour dupliquer), `/devis/:id` fiche imprimable, `/devis/:id/modifier`.
 - Prix **figés** : une ligne n'est recalculée que si on la modifie (quantité, dimensions, produit, finitions) ;
   `detail_calcul` garde `prix_produit`, `detail` et `prix_force` (prix saisi à la main ; finitions alors enregistrées à 0).
+- **Objet automatique** : `resumerObjet()` (edition.ts) résume les produits (« Carte de visite × 500, Bâche × 2 et 1 autre ») ;
+  non saisissable, recalculé à chaque enregistrement.
 - Section « Produits et travaux » : une ligne neuve ne montre que « Choisir un produit… » ; « Autre travail » (`libre`,
   `produit_id` NULL) = hors catalogue, prix toujours saisi. Dimensions saisies en cm, stockées en mm.
 - **TVA optionnelle par devis** : case « Appliquer la TVA » ; décochée → `taux_tva = 0`, le document affiche « Total à payer » HT.
