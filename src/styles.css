@@ -594,6 +594,19 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
   .article-achat select { grid-column: 1 / -1; }
 }
 
+/* ---------- Stock ---------- */
+.texte-succes { color: var(--succes); }
+.resume-stock { display: flex; flex-wrap: wrap; gap: 1rem 2.5rem; }
+.resume-stock > div { display: flex; flex-direction: column; }
+.carte-alerte { border-color: var(--erreur); border-left-width: 4px; }
+.fiche-stock { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.fiche-stock .titre-carte { margin: 0.15rem 0; }
+.stock-actuel { display: flex; flex-direction: column; align-items: flex-end; }
+.stock-actuel strong { font-size: 2rem; line-height: 1.1; }
+.mouvement { display: flex; align-items: center; gap: 1rem; padding: 0.7rem 1rem; }
+.mouvement .carte-corps { gap: 0.1rem; }
+.mouvement > strong { white-space: nowrap; }
+
 /* ---------- Page Paramètres ---------- */
 .page-parametres { max-width: 900px; }
 .titre-carte { font-size: 1.05rem; margin: 0; }

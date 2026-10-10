@@ -67,3 +67,13 @@ export const UNITES_MODE_PRIX: Record<ModePrix, string> = {
 export function options<T extends string>(libelles: Record<T, string>) {
   return (Object.keys(libelles) as T[]).map((valeur) => ({ valeur, libelle: libelles[valeur] }))
 }
+
+// Unité accordée : « 1 ramette », « 7 ramettes », « 2 mètres linéaires » (m² et kg invariables)
+export function uniteAccordee(unite: UniteSupport, quantite: number): string {
+  const libelle = LIBELLES_UNITES[unite]
+  if (Math.abs(quantite) < 2 || unite === 'm2' || unite === 'kg') return libelle
+  return libelle
+    .split(' ')
+    .map((mot) => (mot.endsWith('eau') ? `${mot}x` : `${mot}s`))
+    .join(' ')
+}

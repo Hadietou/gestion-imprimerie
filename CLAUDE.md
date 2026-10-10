@@ -60,7 +60,7 @@ Les droits du menu **reprennent les droits de lecture RLS** ; si on modifie les 
 | Production        | ✓ | ✓ | ✓ |   |
 | Factures, Impayés | ✓ | ✓ (lecture) |   | ✓ |
 | Dépenses          | ✓ |   |   | ✓ |
-| Stock             | ✓ | ✓ | ✓ |   |
+| Stock             | ✓ | ✓ | ✓ | ✓ |
 | Tarifs & catalogue, Utilisateurs, Paramètres | ✓ | | | |
 
 Pages d'arrivée : gérant → `/tableau-de-bord`, accueil → `/commandes`, atelier → `/production`, compta → `/factures`.
@@ -81,6 +81,7 @@ src/
   lib/tarifs.ts         calculerPrix() : prix de vente d’un produit selon sa grille ;
                         prixProduitLigne() (minimum au m² par pièce), montantFinition()
   lib/devis.ts          accès aux devis, statuts, calculerTotaux() (même formule que recalculer_devis)
+  lib/stock.ts          articles, mouvements (entrée / sortie / ajustement), alertes, variation()
   lib/depenses.ts       dépenses, catégories, modes de paiement, enregistrerDepense()
   lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
@@ -95,6 +96,7 @@ src/
   pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte, Parametres,
                         Catalogue (onglets produits & prix / finitions / papiers, supports & encres / machines), Produits,
                         Clients (recherche, appel / e-mail en un clic),
+  pages/Stock.tsx       liste (alertes, valeur), fiche article (historique, sortie, entrée, inventaire)
   pages/Depenses.tsx    mois par mois, totaux par catégorie, fiche (articles achetés → stock), catégories (gérant)
   pages/devis/          Devis (routes), ListeDevis, FicheDevis (document + actions), EditeurDevis,
                         LigneDevis, ChoixClient, DocumentDevis (A4 imprimable), edition.ts (état des lignes)
@@ -142,6 +144,13 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
   entrées en stock **définitives** (mouvements `entree` reliés par `depense_id`) → dépense non supprimable,
   correction par ajustement de stock. Les autres dépenses : saisie simple, bouton Dupliquer pour les récurrentes.
 
+## Stock
+
+- Articles = table `supports` (papiers, bâches, textiles, encres, consommables), créés par le gérant dans Tarifs & catalogue.
+- Toute variation = un mouvement `mouvements_stock` (jamais modifié ni supprimé) ; le déclencheur met à jour `stock_actuel`.
+  Entrée par achat : module Dépenses. Inventaire : on saisit la quantité comptée, l'écart est enregistré en `ajustement` signé.
+- Valeur du stock (stock × dernier prix d'achat) visible du gérant et de la compta seulement.
+
 ## Commandes
 
 ```bash
@@ -171,5 +180,6 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 5 : Clients (fiche selon le type, remise habituelle, recherche)
 - [x] Étape 6 : Devis (grille de prix, finitions, remise client, TVA optionnelle, impression A4 / PDF, statuts)
 - [x] Étape 7 : Dépenses (catégories, mois, achats de fournitures qui entrent en stock, duplication)
+- [x] Étape 8 : Stock (quantités, alertes, valeur, historique, sorties, entrées, inventaire)
 - [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)
