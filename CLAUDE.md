@@ -25,6 +25,8 @@ Toute l'interface, les messages et le code métier (noms de variables, composant
   - `sql/05_donnees_depart.sql` : finitions et fournitures courantes, prix indicatifs (n’écrase rien d’existant).
   - `sql/06_devis.sql` : `devis_lignes.produit_id` et fonction `enregistrer_devis(p_devis, p_lignes)` (en-tête + lignes + finitions
     en une transaction ; SECURITY DEFINER avec contrôle gérant/accueil, car la RLS réserve la suppression de lignes au gérant).
+  - `sql/07_depenses.sql` : `categories_depense`, `depenses`, `mouvements_stock.depense_id`, fonction `enregistrer_depense`
+    (à la création d'un achat, chaque article entre en stock et son prix devient le dernier prix d'achat).
   - Ajout de valeur à un ENUM : script séparé, car PostgreSQL interdit d’utiliser la valeur dans la même exécution.
 - **Prix des devis = grille de prix de vente** (pratique du marché), PAS un calcul de coût machine.
   Chaque produit a un `mode_prix` (forfait, par unité, m², mètre linéaire, mille, par lot), un prix de base,
@@ -57,6 +59,7 @@ Les droits du menu **reprennent les droits de lecture RLS** ; si on modifie les 
 | Commandes         | ✓ | ✓ | ✓ | ✓ (lecture) |
 | Production        | ✓ | ✓ | ✓ |   |
 | Factures, Impayés | ✓ | ✓ (lecture) |   | ✓ |
+| Dépenses          | ✓ |   |   | ✓ |
 | Stock             | ✓ | ✓ | ✓ |   |
 | Tarifs & catalogue, Utilisateurs, Paramètres | ✓ | | | |
 
@@ -78,6 +81,7 @@ src/
   lib/tarifs.ts         calculerPrix() : prix de vente d’un produit selon sa grille ;
                         prixProduitLigne() (minimum au m² par pièce), montantFinition()
   lib/devis.ts          accès aux devis, statuts, calculerTotaux() (même formule que recalculer_devis)
+  lib/depenses.ts       dépenses, catégories, modes de paiement, enregistrerDepense()
   lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
   components/           Chargement, Fenetre (modale <dialog>),
@@ -91,6 +95,7 @@ src/
   pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte, Parametres,
                         Catalogue (onglets produits & prix / finitions / papiers, supports & encres / machines), Produits,
                         Clients (recherche, appel / e-mail en un clic),
+  pages/Depenses.tsx    mois par mois, totaux par catégorie, fiche (articles achetés → stock), catégories (gérant)
   pages/devis/          Devis (routes), ListeDevis, FicheDevis (document + actions), EditeurDevis,
                         LigneDevis, ChoixClient, DocumentDevis (A4 imprimable), edition.ts (état des lignes)
                         EnConstruction (modules à venir)
@@ -130,6 +135,13 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
   Un seul devis par feuille. « Page entière » au choix (`format-a4`). Alerte à l'écran si le contenu dépasse 148,5 mm.
   `window.print()`, styles `@media print` (seul `.document` sort) ; le titre de la page = nom du PDF.
 
+## Dépenses
+
+- Gérant et compta (catégories modifiables par le gérant, `/depenses/categories`).
+- Catégorie `achat_stock` : à la création, liste d'articles (support, quantité, prix unitaire) ; montant = somme ;
+  entrées en stock **définitives** (mouvements `entree` reliés par `depense_id`) → dépense non supprimable,
+  correction par ajustement de stock. Les autres dépenses : saisie simple, bouton Dupliquer pour les récurrentes.
+
 ## Commandes
 
 ```bash
@@ -158,5 +170,6 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 4 : Tarifs & catalogue (produits avec grille de prix et paliers, finitions, supports, machines simplifiées)
 - [x] Étape 5 : Clients (fiche selon le type, remise habituelle, recherche)
 - [x] Étape 6 : Devis (grille de prix, finitions, remise client, TVA optionnelle, impression A4 / PDF, statuts)
+- [x] Étape 7 : Dépenses (catégories, mois, achats de fournitures qui entrent en stock, duplication)
 - [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)

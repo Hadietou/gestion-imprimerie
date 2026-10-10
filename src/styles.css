@@ -574,6 +574,26 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
   .doc-table tbody tr:nth-child(even) td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 
+/* ---------- Dépenses ---------- */
+.navigation-mois { display: flex; align-items: center; gap: 0.5rem; }
+.navigation-mois .bouton { min-width: 44px; padding: 0.4rem; font-size: 1.1rem; }
+.nom-mois { min-width: 9.5rem; text-align: center; text-transform: capitalize; }
+.resume-mois { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem; }
+.resume-mois > div:first-child { display: flex; flex-direction: column; }
+.total-mois { font-size: 1.5rem; }
+.resume-mois .filtres { margin: 0; }
+.carte-ligne .montant-carte { font-size: 1.05rem; }
+.articles-achat { display: flex; flex-direction: column; gap: 0.5rem; }
+.article-achat { display: grid; grid-template-columns: minmax(0, 1fr) 130px 150px 44px; gap: 0.5rem; align-items: center; }
+.article-achat .champ-suffixe input { max-width: none; min-width: 0; }
+.articles-achat .bouton-discret { align-self: flex-start; color: var(--primaire); }
+.entrees-stock { margin: 0; padding-left: 1.2rem; }
+.montant-calcule { font-size: 1.15rem; padding: 0.6rem 0; }
+@media (max-width: 620px) {
+  .article-achat { grid-template-columns: 1fr 1fr 44px; }
+  .article-achat select { grid-column: 1 / -1; }
+}
+
 /* ---------- Page Paramètres ---------- */
 .page-parametres { max-width: 900px; }
 .titre-carte { font-size: 1.05rem; margin: 0; }

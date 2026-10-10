@@ -3,7 +3,7 @@ import { supabase } from './supabase'
 // Accès générique aux tables de référence (machines, supports, finitions, puis clients…)
 // Chaque ligne a un id numérique, un nom et un indicateur actif.
 
-export type TableReferentiel = 'clients' | 'produits' | 'machines' | 'supports' | 'finitions'
+export type TableReferentiel = 'clients' | 'produits' | 'machines' | 'supports' | 'finitions' | 'categories_depense'
 
 export interface LigneReferentiel {
   id: number

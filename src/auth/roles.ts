@@ -25,6 +25,7 @@ export const MENU: EntreeMenu[] = [
   { chemin: '/production',      libelle: 'Production',        icone: '🖨️', roles: ['gerant', 'accueil', 'atelier'] },
   { chemin: '/factures',        libelle: 'Factures',          icone: '🧾', roles: ['gerant', 'accueil', 'compta'] },
   { chemin: '/impayes',         libelle: 'Impayés',           icone: '⏰', roles: ['gerant', 'accueil', 'compta'] },
+  { chemin: '/depenses',        libelle: 'Dépenses',          icone: '💸', roles: ['gerant', 'compta'] },
   { chemin: '/stock',           libelle: 'Stock',             icone: '📚', roles: ['gerant', 'accueil', 'atelier'] },
   { chemin: '/catalogue',       libelle: 'Tarifs & catalogue', icone: '🏷️', roles: ['gerant'] },
   { chemin: '/utilisateurs',    libelle: 'Utilisateurs',      icone: '🔑', roles: ['gerant'] },
