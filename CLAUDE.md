@@ -99,6 +99,8 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 
 - Mobile d'abord (futur Android) : cibles tactiles ≥ 44 px, menu en tiroir sous 860 px.
 - Messages d'erreur Supabase traduits en français avant affichage.
+- Sous-routes d’un module (onglets) : toujours des chemins **absolus** dans `NavLink` / `Navigate` (ex. `/catalogue/produits`).
+  Les routes de module sont en `/*` et React Router v7 résout les liens relatifs sous l’URL courante, ce qui crée des boucles.
 - Montants : la devise est un paramètre ; utiliser `useParametres()` + `formaterMontant(montant, devise)`, ne pas la coder en dur.
 - Paramètres : clé/valeur texte. Nouvelle clé = l'ajouter dans `SECTIONS_PARAMETRES` (src/lib/parametres.ts) ;
   elle est créée en base au premier enregistrement (upsert). Nombres stockés avec un point décimal (lus en `::numeric` par la base).
