@@ -30,6 +30,8 @@ export interface ChampFiche {
   max?: number
   visible?: (v: Valeurs) => boolean
   large?: boolean
+  /** Champ texte : clavier et contrôle adaptés */
+  saisie?: 'email' | 'tel'
   /** Type 'personnalise' : éditeur libre (ex. grille de paliers, simulateur) */
   editeur?: (p: ProprietesEditeur) => ReactNode
   /** Type 'personnalise' : valeur de formulaire initiale à partir de la valeur en base */
@@ -97,6 +99,9 @@ function depuisFormulaire(valeurs: Valeurs, champs: ChampFiche[]) {
     }
 
     if (visible && c.obligatoire && !brut) erreurs[c.cle] = 'Champ obligatoire.'
+    else if (visible && brut && c.saisie === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(brut)) {
+      erreurs[c.cle] = 'Adresse e-mail invalide.'
+    }
     // Texte facultatif vide = NULL ; les listes de choix gardent leur valeur
     donnees[c.cle] = brut || (c.type === 'choix' ? v : null)
   }
@@ -113,7 +118,19 @@ interface ProprietesReferentiel<T extends LigneReferentiel> {
   groupe?: (ligne: T) => string
   ordreGroupes?: string[]
   messageVide: string
+  /** Active une zone de recherche : texte dans lequel chercher pour chaque ligne */
+  texteRecherche?: (ligne: T) => string
+  placeholderRecherche?: string
+  /** Faux : bouton Supprimer masqué (la RLS refuserait sans erreur) */
+  peutSupprimer?: boolean
 }
+
+// Minuscules sans accents, pour une recherche tolérante (« Hélène » = « helene »)
+const normaliser = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
 
 export default function Referentiel<T extends LigneReferentiel>({
   table,
@@ -124,7 +141,11 @@ export default function Referentiel<T extends LigneReferentiel>({
   groupe,
   ordreGroupes = [],
   messageVide,
+  texteRecherche,
+  placeholderRecherche = 'Rechercher…',
+  peutSupprimer = true,
 }: ProprietesReferentiel<T>) {
+  const [recherche, setRecherche] = useState('')
   const [lignes, setLignes] = useState<T[]>([])
   const [chargement, setChargement] = useState(true)
   const [erreur, setErreur] = useState<string | null>(null)
@@ -149,7 +170,14 @@ export default function Referentiel<T extends LigneReferentiel>({
   }, [table, version])
 
   const nbInactifs = lignes.filter((l) => !l.actif).length
-  const visibles = lignes.filter((l) => voirInactifs || l.actif)
+  const termes = normaliser(recherche).split(/\s+/).filter(Boolean)
+  const visibles = lignes.filter((l) => {
+    if (!voirInactifs && !l.actif && termes.length === 0) return false
+    if (termes.length === 0 || !texteRecherche) return true
+    // Tous les mots saisis doivent apparaître (dans n'importe quel ordre)
+    const cible = normaliser(`${l.nom} ${texteRecherche(l)}`)
+    return termes.every((t) => cible.includes(t))
+  })
 
   // Regroupement (ex. machines par technique), dans l'ordre demandé
   const groupes = new Map<string, T[]>()
@@ -166,7 +194,17 @@ export default function Referentiel<T extends LigneReferentiel>({
   return (
     <>
       <div className="barre-actions">
-        {nbInactifs > 0 ? (
+        {texteRecherche && (
+          <input
+            type="search"
+            className="champ-recherche"
+            placeholder={placeholderRecherche}
+            aria-label={placeholderRecherche}
+            value={recherche}
+            onChange={(e) => setRecherche(e.target.value)}
+          />
+        )}
+        {nbInactifs > 0 && termes.length === 0 ? (
           <label className="case-a-cocher petit">
             <input type="checkbox" checked={voirInactifs} onChange={(e) => setVoirInactifs(e.target.checked)} />
             Afficher les désactivés ({nbInactifs})
@@ -183,8 +221,13 @@ export default function Referentiel<T extends LigneReferentiel>({
       {chargement && <p className="texte-doux">Chargement…</p>}
       {!chargement && !erreur && visibles.length === 0 && (
         <div className="vide">
-          <p>{messageVide}</p>
+          <p>{termes.length > 0 ? `Aucun résultat pour « ${recherche.trim()} ».` : messageVide}</p>
         </div>
+      )}
+      {termes.length > 0 && visibles.length > 0 && (
+        <p className="texte-doux petit" role="status">
+          {visibles.length} résultat{visibles.length > 1 ? 's' : ''}
+        </p>
       )}
 
       {nomsGroupes.map((g) => (
@@ -216,6 +259,7 @@ export default function Referentiel<T extends LigneReferentiel>({
           titre={fiche ? fiche.nom : libelleNouveau}
           champs={champs}
           defauts={defauts}
+          peutSupprimer={peutSupprimer}
           onFermer={() => setFiche(undefined)}
           onEnregistre={() => {
             setFiche(undefined)
@@ -233,6 +277,7 @@ function FicheReferentiel({
   titre,
   champs,
   defauts,
+  peutSupprimer,
   onFermer,
   onEnregistre,
 }: {
@@ -241,6 +286,7 @@ function FicheReferentiel({
   titre: string
   champs: ChampFiche[]
   defauts: Valeurs
+  peutSupprimer: boolean
   onFermer: () => void
   onEnregistre: () => void
 }) {
@@ -308,7 +354,7 @@ function FicheReferentiel({
         {erreur && <p className="alerte alerte-erreur" role="alert">{erreur}</p>}
 
         <div className="actions-formulaire">
-          {ligne && (
+          {ligne && peutSupprimer && (
             <button type="button" className="bouton bouton-danger" onClick={effacer} disabled={envoi}>
               Supprimer
             </button>
@@ -425,7 +471,7 @@ function ChampSaisie({
           {suffixe && <span>{suffixe}</span>}
         </span>
       ) : (
-        <input {...proprietes} />
+        <input type={c.saisie ?? 'text'} inputMode={c.saisie} {...proprietes} />
       )}
       {pied}
     </label>

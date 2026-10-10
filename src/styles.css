@@ -376,6 +376,12 @@ input:focus-visible, textarea:focus-visible, .bouton:focus-visible, a:focus-visi
 .pastille input { width: auto; min-height: 0; margin: 0; accent-color: var(--primaire); }
 .pastille.selectionne { border-color: var(--primaire); background: var(--primaire-doux); color: var(--primaire); font-weight: 600; }
 
+.champ-recherche { flex: 1; max-width: 420px; }
+.barre-actions:has(.champ-recherche) { flex-wrap: wrap; }
+.coordonnees { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; margin-top: 0.3rem; }
+.coordonnees a { color: var(--primaire); text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+.coordonnees a:hover { text-decoration: underline; }
+
 .champ-personnalise { display: flex; flex-direction: column; gap: 0.35rem; }
 .libelle-champ { font-weight: 500; font-size: 0.92rem; }
 
@@ -450,5 +456,6 @@ input:focus-visible, textarea:focus-visible, .bouton:focus-visible, a:focus-visi
 @media (max-width: 520px) {
   .choix-role { grid-template-columns: 1fr; }
   .grille-champs { grid-template-columns: 1fr; }
+  .champ-recherche { flex-basis: 100%; max-width: none; }
   .carte-utilisateur, .carte-ligne { flex-direction: column; align-items: stretch; }
 }

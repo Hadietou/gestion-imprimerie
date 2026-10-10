@@ -1,6 +1,13 @@
-import type { CategorieSupport, ModeCalculFinition, ModePrix, Technique, UniteSupport } from './types'
+import type { CategorieSupport, ModeCalculFinition, ModePrix, Technique, TypeClient, UniteSupport } from './types'
 
 // Libellés français des listes de valeurs (types ENUM du schéma SQL)
+
+export const LIBELLES_TYPES_CLIENT: Record<TypeClient, string> = {
+  entreprise: 'Entreprise',
+  particulier: 'Particulier',
+  administration: 'Administration',
+  association: 'Association / ONG',
+}
 
 export const LIBELLES_TECHNIQUES: Record<Technique, string> = {
   numerique: 'Numérique',

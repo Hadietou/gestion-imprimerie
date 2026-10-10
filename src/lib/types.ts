@@ -17,6 +17,22 @@ export type CategorieSupport = 'papier' | 'vinyle' | 'bache' | 'textile' | 'rigi
 export type UniteSupport = 'feuille' | 'ramette' | 'rouleau' | 'm2' | 'metre_lineaire' | 'piece' | 'litre' | 'kg'
 export type ModeCalculFinition = 'forfait' | 'par_unite' | 'par_m2' | 'par_mille'
 
+export type TypeClient = 'entreprise' | 'particulier' | 'administration' | 'association'
+
+export interface Client {
+  id: number
+  type_client: TypeClient
+  nom: string
+  contact: string | null
+  telephone: string | null
+  email: string | null
+  adresse: string | null
+  numero_fiscal: string | null
+  remise_pct: number
+  notes: string | null
+  actif: boolean
+}
+
 export interface Machine {
   id: number
   nom: string

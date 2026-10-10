@@ -76,6 +76,7 @@ src/
   lib/tarifs.ts         calculerPrix() : prix de vente d’un produit selon sa grille
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
   components/           Chargement, Fenetre (modale <dialog>),
+                        Referentiel : recherche sans accents (texteRecherche), peutSupprimer, saisie email/tel,
                         Referentiel (liste groupée + fiche pilotée par des ChampFiche)
   auth/AuthProvider.tsx session + profil (table profils), connexion / déconnexion
   auth/AuthContext.ts   contexte + hook useAuth()
@@ -84,6 +85,7 @@ src/
   layouts/AppLayout.tsx barre latérale (tiroir sur mobile) + en-tête
   pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte, Parametres,
                         Catalogue (onglets produits & prix / finitions / papiers, supports & encres / machines), Produits,
+                        Clients (recherche, appel / e-mail en un clic),
                         EnConstruction (modules à venir)
   styles.css            CSS simple avec variables (thème clair/sombre), pas de framework CSS
 sql/                    compléments au schéma, numérotés
@@ -134,5 +136,6 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 2 : gestion des utilisateurs (création, activation, rôle, mot de passe) + « Mon compte »
 - [x] Étape 3 : Paramètres (coordonnées, devise, TVA, marge, délais, mentions des documents)
 - [x] Étape 4 : Tarifs & catalogue (produits avec grille de prix et paliers, finitions, supports, machines simplifiées)
-- [ ] Modules métier (clients, devis avec calcul de prix, commandes/BAT, production, factures, stock…)
+- [x] Étape 5 : Clients (fiche selon le type, remise habituelle, recherche)
+- [ ] Modules métier (devis avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)
