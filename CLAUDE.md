@@ -11,7 +11,7 @@ Toute l'interface, les messages et le code métier (noms de variables, composant
 - **Supabase** (`@supabase/supabase-js`) : base PostgreSQL + authentification e-mail / mot de passe
 - **Hébergement** : Cloudflare Pages (offre gratuite). Build : `npm run build`, dossier de sortie `dist`.
   Les routes SPA fonctionnent sans configuration (Pages renvoie `index.html` en l'absence de `404.html`).
-- **Plus tard** : PWA (vite-plugin-pwa), puis application Android via Capacitor.
+- **PWA** (vite-plugin-pwa) : installable ; ensuite application Android via Capacitor.
 - Contrainte : **100 % gratuit** (offres gratuites Supabase et Cloudflare, pas de service payant).
 
 ## Base de données
@@ -112,6 +112,7 @@ src/
   pages/devis/          Devis (routes), ListeDevis, FicheDevis (document + actions), EditeurDevis,
                         LigneDevis, ChoixClient, DocumentDevis (A4 imprimable), edition.ts (état des lignes)
                         EnConstruction (modules à venir)
+  pwa/                  installation.ts (invitation à installer, captée dès main.tsx), BandeauxPwa (mise à jour, hors ligne)
   styles.css            CSS simple avec variables (thème clair/sombre), pas de framework CSS
 sql/                    compléments au schéma, numérotés
 supabase/functions/     Edge Functions (Deno)
@@ -197,6 +198,17 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
   (`validate_palette.js`) ; une seule échelle, légende, info-bulle au survol, tableau « Voir les valeurs ».
   Le SVG suit la largeur réelle du conteneur (ResizeObserver) pour rester lisible sur téléphone.
 
+## Application installable (PWA)
+
+- `vite.config.ts` : `VitePWA` en `registerType: 'prompt'` → bandeau « Mettre à jour » (jamais de rechargement imposé
+  pendant une saisie) ; vérification d'une nouvelle version toutes les heures. Seule l'application est précachée ;
+  les appels Supabase (autre domaine) ne sont pas mis en cache : hors connexion, bandeau d'avertissement.
+- Icônes : `npx pwa-assets-generator` (pwa-assets.config.ts, depuis public/favicon.svg ; nécessite `sharp`,
+  sous Windows : `npm install --include=optional --os=win32 --cpu=x64 sharp --no-save`).
+- `public/_headers` (Cloudflare) : pas de cache pour sw.js, registerSW.js, manifest et index.html.
+- Le navigateur intégré de l'outil de développement n'enregistre pas les service workers : tester l'installation
+  dans Chrome / Edge sur le site publié.
+
 ## Commandes
 
 ```bash
@@ -231,4 +243,5 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 10 : Factures et paiements (depuis la commande, acompte déduit, impression, impayés)
 - [x] Étape 11 : Tableau de bord (chiffres du mois, résultat, alertes « À surveiller », graphique 6 mois)
 - [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
-- [ ] PWA, puis Android (Capacitor)
+- [x] Étape 12 : PWA (installable, icônes, mise à jour proposée, bandeau hors connexion)
+- [ ] Android (Capacitor)

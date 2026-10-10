@@ -2,9 +2,11 @@ import { useState, type FormEvent } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { LIBELLES_ROLES } from '../auth/roles'
 import { supabase } from '../lib/supabase'
+import { useInstallation } from '../pwa/installation'
 
 export default function MonCompte() {
   const { session, profil } = useAuth()
+  const { peutInstaller, installee, ios, installer } = useInstallation()
   const [motDePasse, setMotDePasse] = useState('')
   const [confirmation, setConfirmation] = useState('')
   const [envoi, setEnvoi] = useState(false)
@@ -84,6 +86,29 @@ export default function MonCompte() {
             </button>
           </div>
         </form>
+      </section>
+      <section className="carte">
+        <h2 className="titre-section">Installer l’application</h2>
+        {installee ? (
+          <p className="texte-succes">✓ L’application est installée sur cet appareil.</p>
+        ) : peutInstaller ? (
+          <>
+            <p className="texte-doux">Ajoutez l’application à l’écran d’accueil : elle s’ouvre en plein écran, comme une application.</p>
+            <button type="button" className="bouton bouton-principal" onClick={installer}>
+              📲 Installer sur cet appareil
+            </button>
+          </>
+        ) : ios ? (
+          <p className="texte-doux">
+            Sur iPhone / iPad, dans Safari : touchez <strong>Partager</strong> (carré avec une flèche) puis{' '}
+            <strong>« Sur l’écran d’accueil »</strong>.
+          </p>
+        ) : (
+          <p className="texte-doux">
+            Sur Android (Chrome) : menu <strong>⋮</strong> puis <strong>« Installer l’application »</strong>. Sur ordinateur
+            (Chrome, Edge) : icône d’installation à droite de la barre d’adresse.
+          </p>
+        )}
       </section>
     </div>
   )

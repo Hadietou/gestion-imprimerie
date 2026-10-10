@@ -1,0 +1,11 @@
+# En-têtes Cloudflare Pages : le service worker et le manifeste ne doivent pas
+# rester en cache, sinon les mises à jour de l'application tardent à arriver.
+/sw.js
+  Cache-Control: no-cache
+/registerSW.js
+  Cache-Control: no-cache
+/manifest.webmanifest
+  Content-Type: application/manifest+json
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache

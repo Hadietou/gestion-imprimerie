@@ -3,10 +3,12 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { LIBELLES_ROLES, MENU, menuPourRole } from '../auth/roles'
 import { useParametres } from '../parametres/ParametresContext'
+import { useInstallation } from '../pwa/installation'
 
 export default function AppLayout() {
   const { profil, deconnexion } = useAuth()
   const { parametres } = useParametres()
+  const { peutInstaller, installer } = useInstallation()
   const location = useLocation()
   const [menuOuvert, setMenuOuvert] = useState(false)
 
@@ -32,6 +34,11 @@ export default function AppLayout() {
             </NavLink>
           ))}
         </nav>
+        {peutInstaller && (
+          <button type="button" className="bouton bouton-installer" onClick={installer}>
+            📲 Installer l’application
+          </button>
+        )}
         <div className="utilisateur">
           <div>
             <strong>{profil.nom_complet || 'Utilisateur'}</strong>
