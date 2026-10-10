@@ -22,18 +22,18 @@ export default function Catalogue() {
   return (
     <>
       <nav className="onglets" aria-label="Catalogue">
-        <NavLink to="produits">Produits & prix</NavLink>
-        <NavLink to="finitions">Finitions</NavLink>
-        <NavLink to="supports">Papiers & supports</NavLink>
-        <NavLink to="machines">Machines</NavLink>
+        <NavLink to="/catalogue/produits">Produits & prix</NavLink>
+        <NavLink to="/catalogue/finitions">Finitions</NavLink>
+        <NavLink to="/catalogue/supports">Papiers & supports</NavLink>
+        <NavLink to="/catalogue/machines">Machines</NavLink>
       </nav>
       <Routes>
-        <Route index element={<Navigate to="produits" replace />} />
+        <Route index element={<Navigate to="/catalogue/produits" replace />} />
         <Route path="produits" element={<Produits devise={devise} />} />
         <Route path="finitions" element={<Finitions devise={devise} />} />
         <Route path="supports" element={<Supports devise={devise} />} />
         <Route path="machines" element={<Machines />} />
-        <Route path="*" element={<Navigate to="produits" replace />} />
+        <Route path="*" element={<Navigate to="/catalogue/produits" replace />} />
       </Routes>
     </>
   )
