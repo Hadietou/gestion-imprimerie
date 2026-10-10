@@ -209,7 +209,11 @@ function Formulaire({
       </section>
 
       <section>
-        <h2 className="titre-section">Lignes du devis</h2>
+        <h2 className="titre-section">Produits et travaux</h2>
+        <p className="texte-doux petit aide-section">
+          Une ligne par produit commandé (ex. 500 cartes de visite, une bâche de 3 × 1 m). Choisissez le produit, indiquez la
+          quantité : le prix se calcule avec la grille de prix ; vous pouvez ajouter des finitions ou modifier le prix.
+        </p>
         <ol className="liste-cartes lignes-devis">
           {lignes.map((l, i) => (
             <LigneDevis
@@ -227,7 +231,7 @@ function Formulaire({
         </ol>
         {erreurs.lignes && <p className="texte-erreur petit">{erreurs.lignes}</p>}
         <button type="button" className="bouton ajout-ligne" onClick={() => setLignes((ls) => [...ls, ligneVide()])}>
-          + Ajouter une ligne
+          + Ajouter un produit
         </button>
       </section>
 

@@ -134,7 +134,8 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 - Routes : `/devis` liste, `/devis/nouveau` (`?copie=ID` pour dupliquer), `/devis/:id` fiche imprimable, `/devis/:id/modifier`.
 - Prix **figés** : une ligne n'est recalculée que si on la modifie (quantité, dimensions, produit, finitions) ;
   `detail_calcul` garde `prix_produit`, `detail` et `prix_force` (prix saisi à la main ; finitions alors enregistrées à 0).
-- Ligne libre = `produit_id` NULL, prix toujours saisi. Dimensions saisies en cm, stockées en mm.
+- Section « Produits et travaux » : une ligne neuve ne montre que « Choisir un produit… » ; « Autre travail » (`libre`,
+  `produit_id` NULL) = hors catalogue, prix toujours saisi. Dimensions saisies en cm, stockées en mm.
 - **TVA optionnelle par devis** : case « Appliquer la TVA » ; décochée → `taux_tva = 0`, le document affiche « Total à payer » HT.
 - Modifiable en brouillon / envoyé ; accepté / refusé → lecture seule (« Rouvrir » ou « Dupliquer »). Compta : lecture seule.
 - Impression sur feuille **A4** (`@page` A4) : par défaut le devis occupe la **moitié haute** (210 × 148,5 mm,

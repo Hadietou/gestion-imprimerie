@@ -19,7 +19,9 @@ const TECHNIQUES = Object.keys(LIBELLES_TECHNIQUES) as Technique[]
 
 export default function LigneDevis({ numero, ligne: l, produits, finitions, devise, erreur, onChange, onSupprimer }: Proprietes) {
   const produit = produits.find((p) => p.id === l.produit_id) ?? null
-  const libre = l.produit_id === null
+  const libre = l.libre
+  // Ligne neuve : seul le choix du produit est affiché
+  const nonChoisi = l.produit_id === null && !l.libre
   const prixForce = l.prix_force !== null
   const id = (champ: string) => `ligne-${l.cle}-${champ}`
 
@@ -38,13 +40,15 @@ export default function LigneDevis({ numero, ligne: l, produits, finitions, devi
         <span className="numero-ligne">{numero}</span>
         <select
           aria-label={`Ligne ${numero} : produit`}
-          value={l.produit_id ?? ''}
+          value={libre ? 'autre' : (l.produit_id ?? '')}
           onChange={(e) => {
             const choisi = produits.find((p) => p.id === Number(e.target.value)) ?? null
-            onChange(appliquerProduit(l, choisi, produits, finitions))
+            onChange(appliquerProduit(l, e.target.value === 'autre' ? null : choisi, produits, finitions))
           }}
         >
-          <option value="">— Ligne libre (prix saisi) —</option>
+          <option value="" disabled>
+            Choisir un produit…
+          </option>
           {TECHNIQUES.map((t) => {
             const liste = produits.filter((p) => p.technique === t && (p.actif || p.id === l.produit_id))
             return (
@@ -59,11 +63,24 @@ export default function LigneDevis({ numero, ligne: l, produits, finitions, devi
               )
             )
           })}
+          <optgroup label="Hors catalogue">
+            <option value="autre">Autre travail (prix saisi à la main)</option>
+          </optgroup>
         </select>
         <button type="button" className="bouton-fermer" onClick={onSupprimer} aria-label={`Supprimer la ligne ${numero}`}>
           ✕
         </button>
       </div>
+
+      {nonChoisi && (
+        <p className="texte-doux petit">
+          Choisissez le produit dans la liste : son prix se calcule tout seul selon la quantité. Pour un travail qui n’est
+          pas au catalogue, choisissez « Autre travail » en bas de la liste.
+        </p>
+      )}
+      {erreur && nonChoisi && <p className="texte-erreur petit">{erreur}</p>}
+      {!nonChoisi && (
+        <>
 
       <div className="grille-ligne">
         <label className="champ-large" htmlFor={id('description')}>
@@ -174,7 +191,7 @@ export default function LigneDevis({ numero, ligne: l, produits, finitions, devi
 
       <div className="pied-ligne">
         <div className="calcul texte-doux petit">
-          {prixForce ? (libre ? 'Prix saisi' : 'Prix modifié à la main') : l.detail}
+          {prixForce ? (libre ? 'Travail hors catalogue : indiquez son prix HT' : 'Prix modifié à la main') : l.detail}
         </div>
         <div className="prix-ligne">
           {prixForce ? (
@@ -212,6 +229,8 @@ export default function LigneDevis({ numero, ligne: l, produits, finitions, devi
 
       {erreur && <p className="texte-erreur petit">{erreur}</p>}
       {produit && !produit.actif && <p className="texte-doux petit">Produit désactivé dans la grille.</p>}
+        </>
+      )}
     </li>
   )
 }

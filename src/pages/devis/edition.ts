@@ -14,6 +14,8 @@ export interface FinitionLigne {
 export interface LigneEdition {
   cle: string
   produit_id: number | null
+  /** « Autre travail » : hors catalogue, prix saisi à la main. Faux et produit_id null = rien de choisi encore. */
+  libre: boolean
   technique: Technique
   description: string
   quantite: string
@@ -36,6 +38,7 @@ export function ligneVide(): LigneEdition {
   return {
     cle: nouvelleCle(),
     produit_id: null,
+    libre: false,
     technique: 'numerique',
     description: '',
     quantite: '1',
@@ -98,13 +101,14 @@ export function recalculer(l: LigneEdition, produits: Produit[], finitions: Fini
 export function appliquerProduit(l: LigneEdition, produit: Produit | null, produits: Produit[], finitions: Finition[]): LigneEdition {
   if (!produit) {
     // Ligne libre : prix saisi à la main
-    return { ...l, produit_id: null, prix_force: l.prix_force ?? versTexte(totalLigne(l)), detail: '' }
+    return { ...l, produit_id: null, libre: true, prix_force: l.prix_force ?? '', detail: '' }
   }
   const description = [produit.nom, produit.description].filter(Boolean).join('\n')
   return recalculer(
     {
       ...l,
       produit_id: produit.id,
+      libre: false,
       technique: produit.technique,
       description,
       prix_force: null,
@@ -123,6 +127,7 @@ export function depuisBase(l: LigneDevisEnBase): LigneEdition {
   return {
     cle: nouvelleCle(),
     produit_id: l.produit_id,
+    libre,
     technique: l.technique,
     description: l.description,
     quantite: String(l.quantite),
@@ -142,6 +147,8 @@ export function lignesDepuisDevis(d: DevisComplet): LigneEdition[] {
 /** Contrôle d'une ligne avant enregistrement (message d'erreur ou null) */
 export function erreurLigne(l: LigneEdition, produits: Produit[]): string | null {
   const q = versNombre(l.quantite)
+  if (l.produit_id === null && !l.libre) return 'Choisissez un produit dans la liste (ou « Autre travail »).'
+  if (l.libre && !l.prix_force?.trim()) return 'Indiquez le prix de ce travail.'
   if (!l.description.trim()) return 'La désignation est obligatoire.'
   if (!Number.isInteger(q) || q < 1) return 'La quantité doit être un nombre entier d’au moins 1.'
   const produit = produits.find((p) => p.id === l.produit_id)
