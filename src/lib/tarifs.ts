@@ -1,4 +1,4 @@
-import type { ModePrix, Palier, Produit } from './types'
+import type { Finition, ModePrix, Palier, Produit } from './types'
 
 // Calcul du prix de vente d'un produit pour une quantité, d'après sa grille.
 // La quantité s'exprime dans l'unité du mode : exemplaires, m² ou mètres.
@@ -69,4 +69,55 @@ export function calculerPrix(grille: Grille, quantite: number, unite = ''): Resu
       return { total: arrondi(total), detail: parties.filter(Boolean).join(' — '), quantiteFacturee: facturee }
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Lignes de devis
+
+export const auM2 = (mode: ModePrix) => mode === 'par_m2'
+export const auMetre = (mode: ModePrix) => mode === 'par_metre_lineaire'
+
+/**
+ * Prix du produit pour une ligne : quantite exemplaires, dimensions en mm.
+ * Au m² / au mètre, le minimum facturé s'applique à CHAQUE pièce
+ * (une bâche de 0,5 m² est facturée 1 m²), les paliers sur la quantité totale.
+ */
+export function prixProduitLigne(
+  produit: Grille,
+  quantite: number,
+  largeurMm: number | null,
+  hauteurMm: number | null,
+): ResultatPrix | null {
+  if (!(quantite > 0)) return null
+  const mode = produit.mode_prix
+
+  if (auM2(mode) || auMetre(mode)) {
+    const mesure = auM2(mode)
+      ? ((largeurMm ?? 0) * (hauteurMm ?? 0)) / 1e6 // m² d'une pièce
+      : (hauteurMm ?? 0) / 1000 // longueur d'une pièce en m
+    if (!(mesure > 0)) return null
+    const mesureFacturee = Math.max(mesure, produit.quantite_minimum)
+    const unite = auM2(mode) ? 'm²' : 'm'
+    const resultat = calculerPrix({ ...produit, quantite_minimum: 0 }, mesureFacturee * quantite, unite)
+    if (!resultat) return null
+    const parPiece = `${quantite} × ${nombre(mesureFacturee)} ${unite}${mesureFacturee > mesure ? ' (minimum)' : ''}`
+    return { ...resultat, detail: `${parPiece} — ${resultat.detail}` }
+  }
+
+  return calculerPrix(produit, quantite, mode === 'forfait' ? '' : 'ex.')
+}
+
+/** Montant d'une finition pour une ligne (surface totale en m², 0 si inconnue) */
+export function montantFinition(
+  finition: Pick<Finition, 'mode_calcul' | 'prix' | 'cout_fixe'>,
+  quantite: number,
+  surfaceTotaleM2: number,
+): number {
+  const base = {
+    forfait: finition.prix,
+    par_unite: finition.prix * quantite,
+    par_m2: finition.prix * surfaceTotaleM2,
+    par_mille: (finition.prix * quantite) / 1000,
+  }[finition.mode_calcul]
+  return arrondi(base + finition.cout_fixe)
 }

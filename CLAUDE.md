@@ -23,6 +23,8 @@ Toute l'interface, les messages et le code métier (noms de variables, composant
   - `sql/03_produits.sql` : table `produits` (grille de prix de vente) et type `mode_prix`.
   - `sql/04_encres_consommables.sql` : catégories `encre`, `consommable` et unités ramette, rouleau, litre, kg (à lancer seul).
   - `sql/05_donnees_depart.sql` : finitions et fournitures courantes, prix indicatifs (n’écrase rien d’existant).
+  - `sql/06_devis.sql` : `devis_lignes.produit_id` et fonction `enregistrer_devis(p_devis, p_lignes)` (en-tête + lignes + finitions
+    en une transaction ; SECURITY DEFINER avec contrôle gérant/accueil, car la RLS réserve la suppression de lignes au gérant).
   - Ajout de valeur à un ENUM : script séparé, car PostgreSQL interdit d’utiliser la valeur dans la même exécution.
 - **Prix des devis = grille de prix de vente** (pratique du marché), PAS un calcul de coût machine.
   Chaque produit a un `mode_prix` (forfait, par unité, m², mètre linéaire, mille, par lot), un prix de base,
@@ -73,7 +75,10 @@ src/
   lib/format.ts         formaterMontant() et autres mises en forme fr-FR
   lib/libelles.ts       libellés français des ENUM SQL (techniques, unités, catégories…)
   lib/referentiels.ts   CRUD générique des tables de référence (lister, enregistrer, supprimer)
-  lib/tarifs.ts         calculerPrix() : prix de vente d’un produit selon sa grille
+  lib/tarifs.ts         calculerPrix() : prix de vente d’un produit selon sa grille ;
+                        prixProduitLigne() (minimum au m² par pièce), montantFinition()
+  lib/devis.ts          accès aux devis, statuts, calculerTotaux() (même formule que recalculer_devis)
+  lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
   components/           Chargement, Fenetre (modale <dialog>),
                         Referentiel : recherche sans accents (texteRecherche), peutSupprimer, saisie email/tel,
@@ -86,6 +91,8 @@ src/
   pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte, Parametres,
                         Catalogue (onglets produits & prix / finitions / papiers, supports & encres / machines), Produits,
                         Clients (recherche, appel / e-mail en un clic),
+  pages/devis/          Devis (routes), ListeDevis, FicheDevis (document + actions), EditeurDevis,
+                        LigneDevis, ChoixClient, DocumentDevis (A4 imprimable), edition.ts (état des lignes)
                         EnConstruction (modules à venir)
   styles.css            CSS simple avec variables (thème clair/sombre), pas de framework CSS
 sql/                    compléments au schéma, numérotés
@@ -109,6 +116,16 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 - Montants : la devise est un paramètre ; utiliser `useParametres()` + `formaterMontant(montant, devise)`, ne pas la coder en dur.
 - Paramètres : clé/valeur texte. Nouvelle clé = l'ajouter dans `SECTIONS_PARAMETRES` (src/lib/parametres.ts) ;
   elle est créée en base au premier enregistrement (upsert). Nombres stockés avec un point décimal (lus en `::numeric` par la base).
+
+## Devis
+
+- Routes : `/devis` liste, `/devis/nouveau` (`?copie=ID` pour dupliquer), `/devis/:id` fiche imprimable, `/devis/:id/modifier`.
+- Prix **figés** : une ligne n'est recalculée que si on la modifie (quantité, dimensions, produit, finitions) ;
+  `detail_calcul` garde `prix_produit`, `detail` et `prix_force` (prix saisi à la main ; finitions alors enregistrées à 0).
+- Ligne libre = `produit_id` NULL, prix toujours saisi. Dimensions saisies en cm, stockées en mm.
+- **TVA optionnelle par devis** : case « Appliquer la TVA » ; décochée → `taux_tva = 0`, le document affiche « Total à payer » HT.
+- Modifiable en brouillon / envoyé ; accepté / refusé → lecture seule (« Rouvrir » ou « Dupliquer »). Compta : lecture seule.
+- Impression : `window.print()`, styles `@media print` (seul `.document` sort) ; le titre de la page = nom du PDF.
 
 ## Commandes
 
@@ -137,5 +154,6 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 3 : Paramètres (coordonnées, devise, TVA, marge, délais, mentions des documents)
 - [x] Étape 4 : Tarifs & catalogue (produits avec grille de prix et paliers, finitions, supports, machines simplifiées)
 - [x] Étape 5 : Clients (fiche selon le type, remise habituelle, recherche)
-- [ ] Modules métier (devis avec calcul de prix, commandes/BAT, production, factures, stock…)
+- [x] Étape 6 : Devis (grille de prix, finitions, remise client, TVA optionnelle, impression A4 / PDF, statuts)
+- [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [ ] PWA, puis Android (Capacitor)
