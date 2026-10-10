@@ -8,12 +8,12 @@ import {
   LIBELLES_UNITES,
   options,
 } from '../lib/libelles'
-import type { Finition, Machine, Support, Technique, UniteSupport } from '../lib/types'
+import type { CategorieSupport, Finition, Machine, Support, Technique, UniteSupport } from '../lib/types'
 import { useParametres } from '../parametres/ParametresContext'
 import Produits from './Produits'
 
 // Tarifs et catalogue : produits avec leur grille de prix de vente (base des devis),
-// finitions, supports (stock) et machines (atelier).
+// finitions, papiers / supports / encres (stock) et machines (atelier).
 // Écriture réservée au gérant (RLS), lecture pour tous les rôles.
 
 export default function Catalogue() {
@@ -24,7 +24,7 @@ export default function Catalogue() {
       <nav className="onglets" aria-label="Catalogue">
         <NavLink to="/catalogue/produits">Produits & prix</NavLink>
         <NavLink to="/catalogue/finitions">Finitions</NavLink>
-        <NavLink to="/catalogue/supports">Papiers & supports</NavLink>
+        <NavLink to="/catalogue/supports">Papiers, supports & encres</NavLink>
         <NavLink to="/catalogue/machines">Machines</NavLink>
       </nav>
       <Routes>
@@ -95,14 +95,35 @@ function Machines() {
 // ---------------------------------------------------------------- Supports
 
 const unite = (v: Valeurs) => v.unite as UniteSupport
+const categorie = (v: Valeurs) => v.categorie as CategorieSupport
+
+// Encres et produits au poids / volume : pas de format ni de grammage
+const aUnFormat = (v: Valeurs) => categorie(v) !== 'encre' && !['litre', 'kg'].includes(unite(v))
+const enRouleau = (v: Valeurs) => ['rouleau', 'm2', 'metre_lineaire'].includes(unite(v))
+
+const EXEMPLES_DESIGNATION: Partial<Record<CategorieSupport, string>> = {
+  papier: 'Ex. « Couché brillant 135 g SRA3 (ramette 250 f.) ».',
+  bache: 'Ex. « Bâche frontlit 440 g 3,20 × 50 m ».',
+  vinyle: 'Ex. « Vinyle adhésif blanc 1,52 × 50 m ».',
+  encre: 'Ex. « Encre éco-solvant cyan 1 L », « Toner noir ». Une fiche par couleur.',
+  consommable: 'Ex. « Plaque offset CTP », « Émulsion photosensible ».',
+}
 
 function Supports({ devise }: { devise: string }) {
   const champs: ChampFiche[] = [
     { cle: 'categorie', libelle: 'Catégorie', type: 'choix', options: options(LIBELLES_CATEGORIES_SUPPORT), obligatoire: true },
-    { cle: 'nom', libelle: 'Désignation', aide: 'Ex. « Couché brillant 135 g 65×92 ».', type: 'texte', obligatoire: true, large: true },
+    {
+      cle: 'nom',
+      libelle: 'Désignation',
+      aide: (v) => EXEMPLES_DESIGNATION[categorie(v)] ?? '',
+      type: 'texte',
+      obligatoire: true,
+      large: true,
+    },
     {
       cle: 'unite',
-      libelle: 'Vendu / stocké à la',
+      libelle: 'Unité d’achat et de stock',
+      aide: 'Le stock et le seuil d’alerte se comptent dans cette unité.',
       type: 'choix',
       options: options(LIBELLES_UNITES),
       obligatoire: true,
@@ -114,15 +135,16 @@ function Supports({ devise }: { devise: string }) {
       suffixe: 'g/m²',
       facultatif: true,
       min: 0,
-      visible: (v) => ['papier', 'textile', 'bache', 'vinyle'].includes(v.categorie as string),
+      visible: (v) => ['papier', 'textile', 'bache', 'vinyle'].includes(categorie(v)),
     },
     {
       cle: 'largeur_mm',
-      libelle: (v) => (unite(v) === 'feuille' || unite(v) === 'piece' ? 'Largeur' : 'Laize du rouleau'),
+      libelle: (v) => (enRouleau(v) ? 'Laize du rouleau' : 'Largeur'),
       type: 'entier',
       suffixe: 'mm',
       facultatif: true,
       min: 0,
+      visible: aUnFormat,
     },
     {
       cle: 'hauteur_mm',
@@ -131,7 +153,7 @@ function Supports({ devise }: { devise: string }) {
       suffixe: 'mm',
       facultatif: true,
       min: 0,
-      visible: (v) => unite(v) === 'feuille' || unite(v) === 'piece',
+      visible: (v) => aUnFormat(v) && !enRouleau(v),
     },
     {
       cle: 'prix_unitaire',
@@ -150,28 +172,29 @@ function Supports({ devise }: { devise: string }) {
       min: 0,
     },
     { cle: 'fournisseur', libelle: 'Fournisseur', type: 'texte', large: true },
-    { cle: 'actif', libelle: 'Support disponible (proposé dans les devis)', type: 'booleen' },
+    { cle: 'actif', libelle: 'Article en usage (suivi dans le stock)', type: 'booleen' },
   ]
 
   return (
     <>
       <p className="texte-doux petit">
-        Le stock se met à jour par les entrées et sorties du module Stock ; il est seulement affiché ici.
+        Ce que vous achetez et stockez : papiers, bâches, textiles, encres, consommables. Prix d’achat indicatifs.
+        Le stock se mettra à jour par les entrées et sorties du module Stock ; il est seulement affiché ici.
       </p>
       <Referentiel<Support>
         table="supports"
-        libelleNouveau="Nouveau support"
+        libelleNouveau="Nouvel article"
         champs={champs}
-        defauts={{ categorie: 'papier', unite: 'feuille', actif: true }}
+        defauts={{ categorie: 'papier', unite: 'ramette', actif: true }}
         groupe={(s) => LIBELLES_CATEGORIES_SUPPORT[s.categorie]}
         ordreGroupes={Object.values(LIBELLES_CATEGORIES_SUPPORT)}
-        messageVide="Aucun support. Ajoutez vos papiers, vinyles, bâches, textiles…"
+        messageVide="Aucun article. Ajoutez vos papiers, bâches, vinyles, textiles, encres et consommables…"
         resume={(s) =>
           assembler(
             s.grammage && `${s.grammage} g`,
             mm(s.largeur_mm, s.hauteur_mm),
             `${formaterMontant(s.prix_unitaire, devise)} / ${LIBELLES_UNITES[s.unite]}`,
-            `stock ${s.stock_actuel.toLocaleString('fr-FR')}${s.stock_actuel <= s.seuil_alerte && s.seuil_alerte > 0 ? ' ⚠' : ''}`,
+            `stock ${s.stock_actuel.toLocaleString('fr-FR')} ${LIBELLES_UNITES[s.unite]}${s.stock_actuel <= s.seuil_alerte && s.seuil_alerte > 0 ? ' ⚠' : ''}`,
             s.fournisseur,
           )
         }

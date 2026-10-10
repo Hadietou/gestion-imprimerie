@@ -13,8 +13,8 @@ export interface Profil {
 }
 
 export type Technique = 'numerique' | 'offset' | 'grand_format' | 'serigraphie'
-export type CategorieSupport = 'papier' | 'vinyle' | 'bache' | 'textile' | 'rigide' | 'autre'
-export type UniteSupport = 'feuille' | 'm2' | 'metre_lineaire' | 'piece'
+export type CategorieSupport = 'papier' | 'vinyle' | 'bache' | 'textile' | 'rigide' | 'encre' | 'consommable' | 'autre'
+export type UniteSupport = 'feuille' | 'ramette' | 'rouleau' | 'm2' | 'metre_lineaire' | 'piece' | 'litre' | 'kg'
 export type ModeCalculFinition = 'forfait' | 'par_unite' | 'par_m2' | 'par_mille'
 
 export interface Machine {

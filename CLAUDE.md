@@ -21,6 +21,9 @@ Toute l'interface, les messages et le code métier (noms de variables, composant
   Toute évolution de la base = un nouveau fichier `sql/NN_*.sql` rejouable (ne pas modifier un script déjà exécuté).
   - `sql/02_utilisateurs.sql` : fonction `liste_utilisateurs()` (e-mails, réservée au gérant), garde-fou « au moins un gérant actif ».
   - `sql/03_produits.sql` : table `produits` (grille de prix de vente) et type `mode_prix`.
+  - `sql/04_encres_consommables.sql` : catégories `encre`, `consommable` et unités ramette, rouleau, litre, kg (à lancer seul).
+  - `sql/05_donnees_depart.sql` : finitions et fournitures courantes, prix indicatifs (n’écrase rien d’existant).
+  - Ajout de valeur à un ENUM : script séparé, car PostgreSQL interdit d’utiliser la valeur dans la même exécution.
 - **Prix des devis = grille de prix de vente** (pratique du marché), PAS un calcul de coût machine.
   Chaque produit a un `mode_prix` (forfait, par unité, m², mètre linéaire, mille, par lot), un prix de base,
   un minimum facturé et des `paliers` JSON. Calcul unique dans [src/lib/tarifs.ts](src/lib/tarifs.ts) (`calculerPrix`).
@@ -80,7 +83,7 @@ src/
   auth/roles.ts         menu et droits par rôle
   layouts/AppLayout.tsx barre latérale (tiroir sur mobile) + en-tête
   pages/                Connexion, CompteInactif, TableauDeBord, Utilisateurs, MonCompte, Parametres,
-                        Catalogue (onglets produits & prix / finitions / supports / machines), Produits,
+                        Catalogue (onglets produits & prix / finitions / papiers, supports & encres / machines), Produits,
                         EnConstruction (modules à venir)
   styles.css            CSS simple avec variables (thème clair/sombre), pas de framework CSS
 sql/                    compléments au schéma, numérotés

@@ -15,14 +15,20 @@ export const LIBELLES_CATEGORIES_SUPPORT: Record<CategorieSupport, string> = {
   bache: 'Bâche',
   textile: 'Textile',
   rigide: 'Support rigide',
+  encre: 'Encre / toner',
+  consommable: 'Consommable (plaques, écrans, films…)',
   autre: 'Autre',
 }
 
 export const LIBELLES_UNITES: Record<UniteSupport, string> = {
   feuille: 'feuille',
+  ramette: 'ramette',
+  rouleau: 'rouleau',
   m2: 'm²',
   metre_lineaire: 'mètre linéaire',
   piece: 'pièce',
+  litre: 'litre',
+  kg: 'kg',
 }
 
 export const LIBELLES_MODES_CALCUL: Record<ModeCalculFinition, string> = {
