@@ -105,3 +105,20 @@ export async function supprimerDepense(id: number) {
   const { error } = await supabase.from('depenses').delete().eq('id', id)
   if (error) throw new Error(traduire(error.message, error.code))
 }
+
+/** Libellés déjà utilisés, par catégorie (les plus récents d'abord) : la « liste des articles » d'une catégorie de frais */
+export async function listerLibellesParCategorie(): Promise<Map<number, string[]>> {
+  const { data, error } = await supabase
+    .from('depenses')
+    .select('categorie_id, libelle')
+    .order('date_depense', { ascending: false })
+    .limit(1000)
+  if (error) throw new Error(traduire(error.message, error.code))
+  const parCategorie = new Map<number, string[]>()
+  for (const { categorie_id, libelle } of (data ?? []) as { categorie_id: number; libelle: string }[]) {
+    const liste = parCategorie.get(categorie_id) ?? []
+    if (!liste.some((l) => l.toLowerCase() === libelle.toLowerCase())) liste.push(libelle)
+    parCategorie.set(categorie_id, liste)
+  }
+  return parCategorie
+}
