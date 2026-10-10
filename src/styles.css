@@ -583,6 +583,9 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .total-mois { font-size: 1.5rem; }
 .resume-mois .filtres { margin: 0; }
 .carte-ligne .montant-carte { font-size: 1.05rem; }
+.encadre-stock { padding: 0.9rem; border: 2px solid var(--primaire); border-radius: var(--rayon); background: var(--primaire-doux); }
+.encadre-stock .libelle-champ { font-size: 1rem; font-weight: 700; color: var(--primaire); }
+.encadre-stock select, .encadre-stock input { background: var(--surface); }
 .articles-achat { display: flex; flex-direction: column; gap: 0.5rem; }
 .article-achat { display: grid; grid-template-columns: minmax(0, 1fr) 130px 150px 44px; gap: 0.5rem; align-items: center; }
 .article-achat .champ-suffixe input { max-width: none; min-width: 0; }

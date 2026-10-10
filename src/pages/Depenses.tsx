@@ -64,6 +64,7 @@ function ListeDepenses() {
   // undefined = fermée ; null = nouvelle ; Depense = modification ; { modele } = duplication
   const [fiche, setFiche] = useState<Depense | null | { modele: Depense } | undefined>(undefined)
   const [version, setVersion] = useState(0)
+  const [confirmation, setConfirmation] = useState<{ texte: string; stock: boolean } | null>(null)
 
   useEffect(() => {
     let actuel = true
@@ -103,7 +104,14 @@ function ListeDepenses() {
             Catégories…
           </Link>
         )}
-        <button type="button" className="bouton bouton-principal" onClick={() => setFiche(null)}>
+        <button
+          type="button"
+          className="bouton bouton-principal"
+          onClick={() => {
+            setConfirmation(null)
+            setFiche(null)
+          }}
+        >
           + Nouvelle dépense
         </button>
       </div>
@@ -135,6 +143,17 @@ function ListeDepenses() {
         )}
       </section>
 
+      {confirmation && (
+        <p className="alerte alerte-succes" role="status">
+          {confirmation.texte}
+          {confirmation.stock && (
+            <>
+              {' '}
+              <Link to="/stock">Voir le stock →</Link>
+            </>
+          )}
+        </p>
+      )}
       {erreur && <p className="alerte alerte-erreur" role="alert">{erreur}</p>}
       {chargement && <p className="texte-doux">Chargement…</p>}
       {!chargement && !erreur && visibles.length === 0 && (
@@ -182,7 +201,8 @@ function ListeDepenses() {
           peutSupprimer={profil?.role === 'gerant'}
           onFermer={() => setFiche(undefined)}
           onDupliquer={(d) => setFiche({ modele: d })}
-          onEnregistre={(date) => {
+          onEnregistre={(date, texte, stock) => {
+            setConfirmation({ texte, stock })
             setFiche(undefined)
             setMois(date.slice(0, 7))
             setVersion((v) => v + 1)
@@ -221,7 +241,7 @@ function FicheDepense({
   peutSupprimer: boolean
   onFermer: () => void
   onDupliquer: (d: Depense) => void
-  onEnregistre: (date: string) => void
+  onEnregistre: (date: string, confirmation: string, entreeStock: boolean) => void
 }) {
   const source = depense ?? modele
   const actives = categories.filter((c) => c.actif || c.id === source?.categorie_id)
@@ -233,7 +253,8 @@ function FicheDepense({
   const [beneficiaire, setBeneficiaire] = useState(source?.beneficiaire ?? '')
   const [reference, setReference] = useState(depense?.reference ?? '')
   const [notes, setNotes] = useState(source?.notes ?? '')
-  const [articles, setArticles] = useState<LigneArticle[]>([])
+  // Une ligne d'article d'office : un achat sans article n'entre pas en stock
+  const [articles, setArticles] = useState<LigneArticle[]>(() => [ligneArticle()])
   const [supports, setSupports] = useState<Support[]>([])
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState<string | null>(null)
@@ -272,6 +293,13 @@ function FicheDepense({
       if (!(versNombre(a.prix_unitaire) >= 0)) return setErreur('Prix unitaire invalide.')
     }
     if (!(m > 0)) return setErreur('Le montant doit être supérieur à 0.')
+    if (
+      saisieArticles &&
+      articlesRemplis.length === 0 &&
+      !confirm('Aucun article n’est indiqué : cet achat n’entrera PAS en stock. Enregistrer quand même ?')
+    ) {
+      return
+    }
 
     setEnvoi(true)
     try {
@@ -295,7 +323,16 @@ function FicheDepense({
             }))
           : [],
       )
-      onEnregistre(date)
+      const n = saisieArticles ? articlesRemplis.length : 0
+      onEnregistre(
+        date,
+        n > 0
+          ? `Dépense enregistrée — ${n} article${n > 1 ? 's' : ''} entré${n > 1 ? 's' : ''} en stock.`
+          : depense
+            ? 'Dépense modifiée.'
+            : 'Dépense enregistrée.',
+        n > 0,
+      )
     } catch (err) {
       setErreur((err as Error).message)
       setEnvoi(false)
@@ -307,7 +344,7 @@ function FicheDepense({
     setEnvoi(true)
     try {
       await supprimerDepense(depense.id)
-      onEnregistre(depense.date_depense)
+      onEnregistre(depense.date_depense, 'Dépense supprimée.', false)
     } catch (err) {
       setErreur((err as Error).message)
       setEnvoi(false)
@@ -322,10 +359,6 @@ function FicheDepense({
     <Fenetre titre={depense ? depense.libelle : modele ? 'Nouvelle dépense (copie)' : 'Nouvelle dépense'} onFermer={onFermer}>
       <form className="formulaire" onSubmit={valider} noValidate>
         <div className="grille-champs">
-          <label htmlFor="dep-date">
-            <span>Date</span>
-            <input id="dep-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
           <label htmlFor="dep-categorie">
             <span>Catégorie</span>
             <select id="dep-categorie" value={categorieId} onChange={(e) => setCategorieId(e.target.value)} disabled={Boolean(depense?.entrees.length)}>
@@ -335,6 +368,10 @@ function FicheDepense({
                 </option>
               ))}
             </select>
+          </label>
+          <label htmlFor="dep-date">
+            <span>Date</span>
+            <input id="dep-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
           <label className="champ-large" htmlFor="dep-libelle">
             <span>
@@ -349,8 +386,11 @@ function FicheDepense({
           </label>
 
           {saisieArticles && (
-            <div className="champ-large champ-personnalise">
-              <span className="libelle-champ">Articles reçus — entrée en stock</span>
+            <div className="champ-large champ-personnalise encadre-stock">
+              <span className="libelle-champ">📦 Articles achetés — ils entreront en stock</span>
+              <small className="texte-doux">
+                Indiquez chaque article reçu, sa quantité et son prix : le montant de la dépense se calcule tout seul.
+              </small>
               <div className="articles-achat">
                 {articles.map((a, i) => {
                   const support = supports.find((s) => String(s.id) === a.support_id)
@@ -398,7 +438,7 @@ function FicheDepense({
                   )
                 })}
                 <button type="button" className="bouton bouton-discret" onClick={() => setArticles((ls) => [...ls, ligneArticle()])}>
-                  + Ajouter un article
+                  + Ajouter un autre article
                 </button>
               </div>
               <small className="texte-doux">
