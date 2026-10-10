@@ -97,8 +97,7 @@ function Machines() {
 const unite = (v: Valeurs) => v.unite as UniteSupport
 const categorie = (v: Valeurs) => v.categorie as CategorieSupport
 
-// Encres et produits au poids / volume : pas de format ni de grammage
-const aUnFormat = (v: Valeurs) => categorie(v) !== 'encre' && !['litre', 'kg'].includes(unite(v))
+// Format et grammage restent disponibles pour tous les articles (facultatifs)
 const enRouleau = (v: Valeurs) => ['rouleau', 'm2', 'metre_lineaire'].includes(unite(v))
 
 const EXEMPLES_DESIGNATION: Partial<Record<CategorieSupport, string>> = {
@@ -135,7 +134,6 @@ function Supports({ devise }: { devise: string }) {
       suffixe: 'g/m²',
       facultatif: true,
       min: 0,
-      visible: (v) => ['papier', 'textile', 'bache', 'vinyle'].includes(categorie(v)),
     },
     {
       cle: 'largeur_mm',
@@ -144,16 +142,15 @@ function Supports({ devise }: { devise: string }) {
       suffixe: 'mm',
       facultatif: true,
       min: 0,
-      visible: aUnFormat,
     },
     {
       cle: 'hauteur_mm',
-      libelle: 'Hauteur',
+      libelle: (v) => (enRouleau(v) ? 'Longueur du rouleau' : 'Hauteur'),
+      aide: (v) => (enRouleau(v) ? 'Ex. 50 000 mm pour un rouleau de 50 m.' : ''),
       type: 'entier',
       suffixe: 'mm',
       facultatif: true,
       min: 0,
-      visible: (v) => aUnFormat(v) && !enRouleau(v),
     },
     {
       cle: 'prix_unitaire',
