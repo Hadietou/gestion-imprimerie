@@ -100,6 +100,14 @@ export async function partagerPdf(options: {
   return 'telecharge'
 }
 
+/** Enregistre un fichier : téléchargement (navigateur) ou feuille de partage (application Android) */
+export async function enregistrerFichier(blob: Blob, nomFichier: string, titre: string) {
+  if (!estApplicationNative()) return telecharger(blob, nomFichier)
+  const [{ Filesystem, Directory }, { Share }] = await Promise.all([import('@capacitor/filesystem'), import('@capacitor/share')])
+  const fichier = await Filesystem.writeFile({ path: nomFichier, data: await blobEnBase64(blob), directory: Directory.Cache })
+  await Share.share({ title: titre, files: [fichier.uri], dialogTitle: 'Enregistrer ou envoyer le fichier' }).catch(() => {})
+}
+
 export function telecharger(blob: Blob, nomFichier: string) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

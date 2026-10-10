@@ -782,6 +782,19 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .tableau-valeurs th:first-child, .tableau-valeurs thead th:first-child { text-align: left; }
 .tableau-valeurs thead th { color: var(--texte-doux); font-weight: 500; }
 
+/* ---------- Exports Excel ---------- */
+.page-exports { max-width: 900px; display: flex; flex-direction: column; gap: 1rem; }
+.page-exports .filtres { margin: 0.75rem 0 0.5rem; }
+.dates-libres { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.5rem; }
+.dates-libres label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.9rem; font-weight: 500; }
+.liste-exports { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.export { display: flex; align-items: center; gap: 1rem; }
+.export-icone { font-size: 1.6rem; width: 2rem; text-align: center; }
+.export-principal { border: 2px solid var(--primaire); }
+.sauvegarde { display: flex; flex-direction: column; gap: 0.75rem; border-left: 4px solid var(--attention); }
+.sauvegarde .bouton { align-self: flex-start; }
+.sauvegarde p { margin: 0; }
+
 /* ---------- Envoi WhatsApp ---------- */
 .bouton-whatsapp { border-color: #128c3e; color: #128c3e; font-weight: 600; }
 .bouton-whatsapp:hover { background: #128c3e; color: #fff; }

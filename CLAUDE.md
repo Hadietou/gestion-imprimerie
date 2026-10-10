@@ -63,7 +63,7 @@ Les droits du menu **reprennent les droits de lecture RLS** ; si on modifie les 
 | Commandes         | ✓ | ✓ | ✓ | ✓ (lecture) |
 | Production        | ✓ | ✓ | ✓ |   |
 | Factures, Impayés | ✓ | ✓ (lecture) |   | ✓ |
-| Dépenses          | ✓ |   |   | ✓ |
+| Dépenses, Exports Excel | ✓ |   |   | ✓ |
 | Stock             | ✓ | ✓ | ✓ | ✓ |
 | Tarifs & catalogue, Utilisateurs, Paramètres | ✓ | | | |
 
@@ -92,6 +92,7 @@ src/
   lib/depenses.ts       dépenses, catégories, modes de paiement, enregistrerDepense()
   lib/partage.ts        PDF d'un .document (html2canvas-pro + jsPDF, chargés à la demande) et envoi :
                         Android natif → Share ; téléphone → navigator.share ; ordinateur → téléchargement + wa.me
+  lib/exports.ts        exports Excel (write-excel-file, à la demande) : feuilles par module, synthèse, sauvegarde
   lib/lettres.ts        montantEnLettres() pour « Arrêté le présent devis à la somme de … »
   parametres/           ParametresProvider + useParametres() (nom, devise, TVA… chargés une fois connecté)
   components/           Chargement, Fenetre (modale <dialog>), GraphiqueFinances (colonnes encaissé / dépenses),
@@ -110,6 +111,7 @@ src/
   pages/Depenses.tsx    mois par mois, totaux par catégorie, catégories (gérant) ; FicheDepense.tsx : saisie
   pages/commandes/      Commandes (routes), ListeCommandes, FicheCommande (étapes, BAT, travaux, montants, livraison)
   pages/factures/       Factures (routes), ListeFactures, FicheFacture (paiements), DocumentFacture (A4 / demi-page)
+  pages/Exports.tsx     période + dossier comptable, exports par module, sauvegarde complète (gérant, compta)
   pages/Impayes.tsx     factures non soldées, retard, appel du client
   pages/Production.tsx  file de l'atelier (Démarrer / Terminé / Bloqué, machine)
   pages/devis/          Devis (routes), ListeDevis, FicheDevis (document + actions), EditeurDevis,
@@ -218,6 +220,12 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
   (210 mm, sans les règles « petit écran », limitées à `.feuille`), message prêt (montant, validité / reste à payer).
   Numéro : indicatif `parametres.indicatif_telephone` (222) ajouté aux numéros locaux. Devis en brouillon → « envoyé ».
 
+## Exports Excel
+
+- `enregistrerClasseur(feuilles, nom)` : vrais nombres (format `#,##0.00`), vraies dates (`dd/mm/yyyy`), en-tête figé.
+  Web → téléchargement ; Android → feuille de partage. Nouvelle liste = une fonction `feuilleXxx(periode?)` dans lib/exports.ts.
+- Supabase gratuit : **pas de sauvegarde automatique** → « Sauvegarde complète » à faire chaque semaine (rappel dans la page).
+
 ## Commandes
 
 ```bash
@@ -253,4 +261,5 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [x] Étape 11 : Tableau de bord (chiffres du mois, résultat, alertes « À surveiller », graphique 6 mois)
 - [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [x] Étape 12 : PWA (installable, icônes, mise à jour proposée, bandeau hors connexion)
+- [x] Étape 13 : Envoi WhatsApp (PDF) et exports Excel (dossier comptable, sauvegarde complète)
 - [ ] Android (Capacitor)

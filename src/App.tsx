@@ -21,6 +21,7 @@ import Commandes from './pages/commandes/Commandes'
 import Production from './pages/Production'
 import Factures from './pages/factures/Factures'
 import Impayes from './pages/Impayes'
+import Exports from './pages/Exports'
 import { ParametresProvider } from './parametres/ParametresProvider'
 
 // Pages réelles par chemin ; les autres entrées du MENU affichent « en construction »
@@ -37,6 +38,7 @@ const PAGES: Record<string, ReactNode> = {
   '/production': <Production />,
   '/factures': <Factures />,
   '/impayes': <Impayes />,
+  '/exports': <Exports />,
 }
 
 function RedirectionAccueil() {
