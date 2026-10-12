@@ -34,6 +34,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
         navigateFallback: '/index.html',
+        // Pages statiques servies telles quelles (pas l'application)
+        navigateFallbackDenylist: [/^\/confidentialite/],
         cleanupOutdatedCaches: true,
       },
     }),

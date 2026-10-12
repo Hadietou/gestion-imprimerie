@@ -26,3 +26,8 @@ dist-ssr
 # Variables d'environnement (clés Supabase)
 .env
 .env.local
+
+# Signature de l'application Android (Play Store) : ne jamais publier
+*.jks
+*.keystore
+android/keystore.properties
