@@ -12,10 +12,10 @@ if (fichierSignature.exists()) {
 }
 
 android {
-    namespace = "com.hadietou.sahelprint"
+    namespace = "com.hadietou.bsdimprimerie"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.hadietou.sahelprint"
+        applicationId "com.hadietou.bsdimprimerie"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

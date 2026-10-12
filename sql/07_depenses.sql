@@ -1,5 +1,5 @@
 -- =====================================================================
---  SAHEL PRINT — Étape 7 : dépenses de fonctionnement
+--  BSD IMPRIMERIE — Étape 7 : dépenses de fonctionnement
 --
 --  - Catégories de dépenses (modifiables par le gérant)
 --  - Dépenses (électricité, salaires, loyer, achats…)

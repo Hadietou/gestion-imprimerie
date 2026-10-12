@@ -323,7 +323,7 @@ function FenetreEdition({
 function FenetreIdentifiants({ identifiants, onFermer }: { identifiants: Identifiants; onFermer: () => void }) {
   const [copie, setCopie] = useState(false)
   const texte =
-    `Application Sahel Print : ${window.location.origin}\n` +
+    `Application BSD Imprimerie : ${window.location.origin}\n` +
     `Identifiant : ${identifiants.email}\n` +
     `Mot de passe provisoire : ${identifiants.motDePasse}\n` +
     `Pensez à le changer dans « Mon compte » après votre première connexion.`

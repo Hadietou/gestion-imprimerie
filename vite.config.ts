@@ -14,8 +14,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon-180x180.png'],
       manifest: {
-        name: 'Sahel Print',
-        short_name: 'Sahel Print',
+        name: 'BSD Imprimerie',
+        short_name: 'BSD Imprimerie',
         description: 'Devis, commandes, production, factures et stock de l’imprimerie',
         lang: 'fr',
         start_url: '/',

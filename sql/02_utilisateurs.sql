@@ -1,5 +1,5 @@
 -- =====================================================================
---  SAHEL PRINT — Étape 2 : gestion des utilisateurs
+--  BSD IMPRIMERIE — Étape 2 : gestion des utilisateurs
 --
 --  À exécuter APRÈS imprimerie_schema.sql
 --  Supabase > SQL Editor > New query > coller > Run (script rejouable)

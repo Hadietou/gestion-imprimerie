@@ -1,5 +1,5 @@
 -- =====================================================================
---  SAHEL PRINT — Données de départ : finitions et fournitures
+--  BSD IMPRIMERIE — Données de départ : finitions et fournitures
 --
 --  Finitions et fournitures (papiers, supports, encres, consommables)
 --  les plus courantes, avec des PRIX INDICATIFS à corriger dans

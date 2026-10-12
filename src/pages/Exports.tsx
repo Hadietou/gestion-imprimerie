@@ -166,7 +166,7 @@ export default function Exports() {
           type="button"
           className="bouton bouton-principal"
           disabled={enCours !== null}
-          onClick={() => lancer('sauvegarde', `Sauvegarde Sahel Print ${iso(new Date())}.xlsx`, feuillesSauvegarde)}
+          onClick={() => lancer('sauvegarde', `Sauvegarde BSD Imprimerie ${iso(new Date())}.xlsx`, feuillesSauvegarde)}
         >
           {enCours === 'sauvegarde' ? 'Préparation de la sauvegarde…' : '💾 Télécharger la sauvegarde complète'}
         </button>

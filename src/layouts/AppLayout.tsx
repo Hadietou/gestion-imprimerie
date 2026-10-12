@@ -24,7 +24,7 @@ export default function AppLayout() {
       <aside className="barre-laterale" aria-label="Navigation principale">
         <div className="marque">
           <img src="/favicon.svg" alt="" width={32} height={32} />
-          <span>{parametres?.nom_imprimerie || 'Sahel Print'}</span>
+          <span>{parametres?.nom_imprimerie || 'BSD Imprimerie'}</span>
         </div>
         <nav>
           {entrees.map((e) => (

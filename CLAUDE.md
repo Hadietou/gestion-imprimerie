@@ -1,6 +1,6 @@
-# Sahel Print
+# BSD Imprimerie
 
-Sahel Print : application de gestion pour une imprimerie (numérique, offset, grand format, sérigraphie).
+BSD Imprimerie : application de gestion pour une imprimerie (numérique, offset, grand format, sérigraphie).
 4 utilisateurs, chacun avec un rôle : **gérant**, **accueil**, **atelier**, **compta**.
 Toute l'interface, les messages et le code métier (noms de variables, composants) sont **en français**.
 
@@ -232,7 +232,7 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 
 ## Application Android (Capacitor)
 
-- `capacitor.config.ts` : appId `com.hadietou.sahelprint`, nom « Sahel Print » (**définitif après la 1re publication Play Store**), webDir `dist`.
+- `capacitor.config.ts` : appId `com.hadietou.bsdimprimerie`, nom « BSD Imprimerie » (**définitif après la 1re publication Play Store**), webDir `dist`.
 - L'application web est **embarquée** dans l'APK : toute modification exige une nouvelle version (versionCode +1 dans
   android/app/build.gradle) publiée sur le Play Store ; la PWA, elle, se met à jour seule.
 - Natif : pas de service worker (`BandeauHorsLigne` seulement), bouton Retour (`src/pwa/natif.ts`), PDF / Excel par
