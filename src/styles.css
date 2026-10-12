@@ -718,6 +718,8 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .doc-signature-seule { grid-template-columns: 1fr; width: 50%; margin-left: auto; }
 
 /* ---------- Tableau de bord ---------- */
+.actions-rapides { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+.action-rapide { flex: 1 1 200px; justify-content: center; min-height: 56px; font-size: 1.05rem; font-weight: 700; }
 .tuiles-stat { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.75rem; }
 .stat { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.9rem 1rem; background: var(--surface); border: 1px solid var(--bordure); border-radius: 12px; color: var(--texte); text-decoration: none; }
 .stat-libelle { font-size: 0.82rem; color: var(--texte-doux); }

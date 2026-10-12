@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core'
 import { useSyncExternalStore } from 'react'
 
 // Installation de l'application (PWA).
@@ -17,7 +18,9 @@ const prevenir = () => abonnes.forEach((f) => f())
 
 const dejaInstallee = () =>
   typeof window !== 'undefined' &&
-  (window.matchMedia('(display-mode: standalone)').matches || (navigator as { standalone?: boolean }).standalone === true)
+  (Capacitor.isNativePlatform() || // application Android du Play Store
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as { standalone?: boolean }).standalone === true)
 
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeinstallprompt', (e) => {

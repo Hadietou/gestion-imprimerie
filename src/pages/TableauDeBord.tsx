@@ -61,6 +61,17 @@ export default function TableauDeBord() {
         Bonjour {prenom} — espace <strong>{LIBELLES_ROLES[profil.role]}</strong>
       </p>
 
+      {(profil.role === 'gerant' || profil.role === 'accueil') && (
+        <div className="actions-rapides">
+          <Link to="/commandes/nouvelle" className="bouton bouton-principal action-rapide">
+            + Nouvelle commande
+          </Link>
+          <Link to="/devis/nouveau" className="bouton action-rapide">
+            + Nouveau devis
+          </Link>
+        </div>
+      )}
+
       {f && (
         <section className="section">
           <h2 className="titre-section">Chiffres de {nomMoisCourant}</h2>

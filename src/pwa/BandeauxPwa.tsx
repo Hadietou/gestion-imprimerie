@@ -1,19 +1,11 @@
-import { useSyncExternalStore } from 'react'
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import { useEnLigne } from './reseau'
 
-// Bandeaux en bas de l'écran : nouvelle version disponible, connexion perdue.
-
-const sAbonnerReseau = (f: () => void) => {
-  window.addEventListener('online', f)
-  window.addEventListener('offline', f)
-  return () => {
-    window.removeEventListener('online', f)
-    window.removeEventListener('offline', f)
-  }
-}
+// Version navigateur : bandeaux « nouvelle version disponible » et « hors connexion ».
+// (L'application Android n'utilise pas de service worker : voir BandeauHorsLigne.)
 
 export default function BandeauxPwa() {
-  const enLigne = useSyncExternalStore(sAbonnerReseau, () => navigator.onLine)
+  const enLigne = useEnLigne()
   const {
     needRefresh: [miseAJour, setMiseAJour],
     updateServiceWorker,
