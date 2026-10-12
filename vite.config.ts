@@ -35,7 +35,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
         navigateFallback: '/index.html',
         // Pages statiques servies telles quelles (pas l'application)
-        navigateFallbackDenylist: [/^\/confidentialite/],
+        navigateFallbackDenylist: [/^\/confidentialite/, /^\/suppression-compte/],
         cleanupOutdatedCaches: true,
       },
     }),
