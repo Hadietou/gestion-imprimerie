@@ -1,1 +1,4 @@
 * text=auto eol=lf
+# Scripts Windows : fins de ligne Windows obligatoires
+*.bat text eol=crlf
+*.cmd text eol=crlf

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Gestion Imprimerie</string>
+    <string name="title_activity_main">Gestion Imprimerie</string>
+    <string name="package_name">com.hadietou.gestionimprimerie</string>
+    <string name="custom_url_scheme">com.hadietou.gestionimprimerie</string>
+</resources>

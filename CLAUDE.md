@@ -230,6 +230,19 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
   Web → téléchargement ; Android → feuille de partage. Nouvelle liste = une fonction `feuilleXxx(periode?)` dans lib/exports.ts.
 - Supabase gratuit : **pas de sauvegarde automatique** → « Sauvegarde complète » à faire chaque semaine (rappel dans la page).
 
+## Application Android (Capacitor)
+
+- `capacitor.config.ts` : appId `com.hadietou.gestionimprimerie` (**définitif après la 1re publication Play Store**), webDir `dist`.
+- L'application web est **embarquée** dans l'APK : toute modification exige une nouvelle version (versionCode +1 dans
+  android/app/build.gradle) publiée sur le Play Store ; la PWA, elle, se met à jour seule.
+- Natif : pas de service worker (`BandeauHorsLigne` seulement), bouton Retour (`src/pwa/natif.ts`), PDF / Excel par
+  `@capacitor/share` + `@capacitor/filesystem` (window.print n'existe pas dans la WebView).
+- Compilation : `npm run android:apk` (test) / `npm run android:aab` (Play Store, signé si android/keystore.properties existe).
+  JAVA_HOME = JDK d'Android Studio (Java 25) → wrapper **Gradle 9.1** (Gradle 8.14 du modèle Capacitor ne supporte pas Java 25).
+  Gradle utilise GRADLE_USER_HOME=D:\Android Studio. Connexion instable : télécharger les gros fichiers avec reprise (curl -C -).
+- Icônes / écrans de démarrage : `node assets/generer-sources.mjs` puis `node assets/generer-android.mjs` (sharp).
+- Politique de confidentialité exigée par le Play Store : https://gestion-imprimerie.pages.dev/confidentialite.html
+
 ## Commandes
 
 ```bash
@@ -266,4 +279,4 @@ Configuration locale : copier `.env.example` en `.env.local` et renseigner l'URL
 - [ ] Modules métier ( avec calcul de prix, commandes/BAT, production, factures, stock…)
 - [x] Étape 12 : PWA (installable, icônes, mise à jour proposée, bandeau hors connexion)
 - [x] Étape 13 : Envoi WhatsApp (PDF) et exports Excel (dossier comptable, sauvegarde complète)
-- [ ] Android (Capacitor)
+- [x] Étape 14 : Application Android (Capacitor) — APK de test compilé ; publication Play Store à faire par le gérant
