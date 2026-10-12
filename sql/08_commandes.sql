@@ -1,5 +1,5 @@
 -- =====================================================================
---  GESTION IMPRIMERIE — Étape 9 : commandes, BAT et production
+--  SAHEL PRINT — Étape 9 : commandes, BAT et production
 --
 --  - Commande créée à partir d'un devis (lignes, finitions, remise, TVA)
 --  - Le statut de la commande suit les BAT et l'avancement de l'atelier

@@ -1,5 +1,5 @@
 -- =====================================================================
---  GESTION IMPRIMERIE — Étape 2 : gestion des utilisateurs
+--  SAHEL PRINT — Étape 2 : gestion des utilisateurs
 --
 --  À exécuter APRÈS imprimerie_schema.sql
 --  Supabase > SQL Editor > New query > coller > Run (script rejouable)

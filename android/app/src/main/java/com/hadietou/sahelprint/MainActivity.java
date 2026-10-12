@@ -1,4 +1,4 @@
-package com.hadietou.gestionimprimerie;
+package com.hadietou.sahelprint;
 
 import com.getcapacitor.BridgeActivity;
 

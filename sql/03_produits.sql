@@ -1,5 +1,5 @@
 -- =====================================================================
---  GESTION IMPRIMERIE — Étape 4 bis : catalogue de produits et prix de vente
+--  SAHEL PRINT — Étape 4 bis : catalogue de produits et prix de vente
 --
 --  Les devis se font à partir d'une grille de prix de vente (pratique du
 --  marché), et non à partir des coûts machine.

@@ -1,5 +1,5 @@
 -- =====================================================================
---  GESTION IMPRIMERIE — Encres et consommables dans le stock
+--  SAHEL PRINT — Encres et consommables dans le stock
 --
 --  Ajoute les catégories « encre » et « consommable » et les unités
 --  d'achat courantes (ramette, rouleau, litre, kg).

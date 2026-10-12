@@ -1,5 +1,5 @@
 -- =====================================================================
---  GESTION IMPRIMERIE — Étape 10 : factures et paiements
+--  SAHEL PRINT — Étape 10 : factures et paiements
 --
 --  - Facture créée à partir d'une commande (montants, remise, TVA)
 --  - L'acompte de la commande devient un premier paiement

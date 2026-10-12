@@ -33,7 +33,7 @@ export default function Connexion() {
     <main className="page-connexion">
       <form className="carte-connexion" onSubmit={valider} noValidate={false}>
         <img src="/favicon.svg" alt="" width={56} height={56} />
-        <h1>Gestion Imprimerie</h1>
+        <h1>Sahel Print</h1>
         <p className="sous-titre">Connectez-vous pour accéder à votre espace.</p>
 
         {!supabaseConfigure && (

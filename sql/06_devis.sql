@@ -1,5 +1,5 @@
 -- =====================================================================
---  GESTION IMPRIMERIE — Étape 6 : devis
+--  SAHEL PRINT — Étape 6 : devis
 --
 --  - Lien entre une ligne de devis et le produit de la grille de prix
 --  - Enregistrement d'un devis complet (en-tête + lignes + finitions)

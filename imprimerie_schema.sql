@@ -1,5 +1,5 @@
 -- =====================================================================
---  GESTION IMPRIMERIE — Schéma de base de données (Supabase / PostgreSQL)
+--  SAHEL PRINT — Schéma de base de données (Supabase / PostgreSQL)
 --  Étape 1 : tables, numérotation automatique, stock, sécurité par rôles
 --
 --  Utilisation : Supabase > SQL Editor > New query > coller > Run
