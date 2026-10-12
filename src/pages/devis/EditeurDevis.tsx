@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import {
@@ -35,9 +35,12 @@ const aujourdhui = () => new Date().toISOString().slice(0, 10)
 const texte = (n: number) => String(n).replace('.', ',')
 
 // Création (/devis/nouveau, éventuellement ?copie=ID) ou modification (/devis/:id/modifier).
-// modeCommande (/commandes/nouvelle) : commande directe, sans passer par l'envoi d'un devis.
-// Le devis est créé en coulisse (déjà accepté) puis transformé en commande.
-export default function EditeurDevis({ modeCommande = false }: { modeCommande?: boolean }) {
+// Saisie unique « devis ou commande » : en création, on choisit en haut du formulaire.
+//  - Commande (cas le plus fréquent, accord oral) : le devis est créé en coulisse, déjà accepté,
+//    puis transformé en commande (livraison, urgence, BAT, acompte).
+//  - Devis : à envoyer au client.
+// commandeParDefaut : choix présélectionné (vrai depuis /commandes/nouvelle et le tableau de bord).
+export default function EditeurDevis({ commandeParDefaut = false }: { commandeParDefaut?: boolean }) {
   const { id } = useParams()
   const [parametresUrl] = useSearchParams()
   const idCopie = parametresUrl.get('copie')
@@ -82,7 +85,7 @@ export default function EditeurDevis({ modeCommande = false }: { modeCommande?: 
       tauxTvaDefaut={versNombre(parametres.taux_tva) || 0}
       validiteDefaut={versNombre(parametres.validite_devis_j) || 30}
       devise={parametres.devise}
-      modeCommande={modeCommande}
+      commandeParDefaut={commandeParDefaut}
     />
   )
 }
@@ -94,7 +97,7 @@ function Formulaire({
   tauxTvaDefaut,
   validiteDefaut,
   devise,
-  modeCommande,
+  commandeParDefaut,
 }: {
   referentiels: Referentiels
   source: DevisComplet | null
@@ -102,9 +105,12 @@ function Formulaire({
   tauxTvaDefaut: number
   validiteDefaut: number
   devise: string
-  modeCommande: boolean
+  commandeParDefaut: boolean
 }) {
   const navigate = useNavigate()
+  // Devis ou commande : choisi en création seulement (un devis existant reste un devis)
+  const [typeSaisie, setTypeSaisie] = useState<'commande' | 'devis'>(commandeParDefaut && !modification ? 'commande' : 'devis')
+  const modeCommande = typeSaisie === 'commande'
   const { profil } = useAuth()
   const { produits, finitions } = referentiels
 
@@ -125,8 +131,6 @@ function Formulaire({
   const [erreurs, setErreurs] = useState<Record<string, string>>({})
   const [message, setMessage] = useState<string | null>(null)
   const [envoi, setEnvoi] = useState(false)
-  // Vrai : après l'enregistrement, ouvrir la création de la commande (commande directe au comptoir)
-  const creerCommandeApres = useRef(false)
   // Commande directe : livraison, urgence, BAT, acompte
   const [livraison, setLivraison] = useState('')
   const [urgent, setUrgent] = useState(false)
@@ -200,7 +204,7 @@ function Formulaire({
         navigate(`/commandes/${idCommande}`)
         return
       }
-      navigate(`/devis/${nouvelId}${creerCommandeApres.current ? '?commande=1' : ''}`)
+      navigate(`/devis/${nouvelId}`)
     } catch (err) {
       setMessage((err as Error).message)
       setEnvoi(false)
@@ -213,11 +217,38 @@ function Formulaire({
         <p className="alerte alerte-succes">Copie du devis {source.numero} : vérifiez les informations puis enregistrez.</p>
       )}
 
+      {!modification && (
+        <div className="choix-type" role="radiogroup" aria-label="Type de saisie">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={modeCommande}
+            className={`type-saisie ${modeCommande ? 'selectionne' : ''}`}
+            onClick={() => setTypeSaisie('commande')}
+          >
+            <span className="type-icone" aria-hidden="true">📦</span>
+            <strong>Commande</strong>
+            <small>Le client a donné son accord : on lance le travail</small>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={!modeCommande}
+            className={`type-saisie ${!modeCommande ? 'selectionne' : ''}`}
+            onClick={() => setTypeSaisie('devis')}
+          >
+            <span className="type-icone" aria-hidden="true">📝</span>
+            <strong>Devis</strong>
+            <small>Proposition de prix à envoyer au client</small>
+          </button>
+        </div>
+      )}
+
       <section className="carte">
         <h2 className="titre-carte">{modeCommande ? 'Nouvelle commande' : modification && source ? `Devis ${source.numero}` : 'Nouveau devis'}</h2>
         {modeCommande && (
           <p className="texte-doux petit">
-            Commande directe (prix discuté avec le client) : un devis accepté est créé automatiquement et reste consultable.
+            Un devis accepté est créé automatiquement avec la commande et reste consultable.
           </p>
         )}
         <div className="grille-champs">
@@ -373,14 +404,9 @@ function Formulaire({
             {envoi ? 'Enregistrement…' : 'Enregistrer la commande'}
           </button>
         ) : (
-          <>
-            <button type="submit" className="bouton" disabled={envoi} onClick={() => (creerCommandeApres.current = true)}>
-              Enregistrer et créer la commande
-            </button>
-            <button type="submit" className="bouton bouton-principal" disabled={envoi} onClick={() => (creerCommandeApres.current = false)}>
-              {envoi ? 'Enregistrement…' : 'Enregistrer le devis'}
-            </button>
-          </>
+          <button type="submit" className="bouton bouton-principal" disabled={envoi}>
+            {envoi ? 'Enregistrement…' : 'Enregistrer le devis'}
+          </button>
         )}
       </div>
     </form>

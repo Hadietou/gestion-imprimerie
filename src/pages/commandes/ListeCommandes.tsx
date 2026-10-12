@@ -66,7 +66,7 @@ export default function ListeCommandes() {
         <span />
         {(profil?.role === 'gerant' || profil?.role === 'accueil') && (
           <Link to="/commandes/nouvelle" className="bouton bouton-principal">
-            + Nouvelle commande
+            + Nouveau devis / commande
           </Link>
         )}
       </div>
@@ -85,7 +85,7 @@ export default function ListeCommandes() {
         <div className="vide">
           <p>
             {commandes.length === 0
-              ? 'Aucune commande. Cliquez sur « + Nouvelle commande » (ou acceptez un devis).'
+              ? 'Aucune commande. Cliquez sur « + Nouveau devis / commande ».'
               : 'Aucune commande ne correspond.'}
           </p>
         </div>

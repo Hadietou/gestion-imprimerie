@@ -56,7 +56,7 @@ export default function ListeDevis() {
         <span />
         {peutCreer && (
           <Link to="/devis/nouveau" className="bouton bouton-principal">
-            + Nouveau devis
+            + Nouveau devis / commande
           </Link>
         )}
       </div>

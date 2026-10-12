@@ -8,8 +8,8 @@ export default function Commandes() {
   return (
     <Routes>
       <Route index element={<ListeCommandes />} />
-      {/* Commande directe : même saisie que le devis, devis accepté créé en coulisse */}
-      <Route path="nouvelle" element={<EditeurDevis modeCommande />} />
+      {/* Saisie unique devis / commande, « Commande » présélectionné */}
+      <Route path="nouvelle" element={<EditeurDevis commandeParDefaut />} />
       <Route path=":id" element={<FicheCommande />} />
       <Route path="*" element={<Navigate to="/commandes" replace />} />
     </Routes>

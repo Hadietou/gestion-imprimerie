@@ -179,9 +179,10 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 
 ## Commandes, BAT, production
 
-- **Commande directe** (cas le plus fréquent : prix discuté oralement) : `/commandes/nouvelle` = `EditeurDevis modeCommande`.
-  Même saisie que le devis + livraison, urgent, « BAT à faire » (décoché par défaut → bat_valide), acompte.
-  Enchaîne `enregistrer_devis` → `creer_commande_depuis_devis` → `modifierCommande` : le devis existe (accepté) mais reste en coulisse.
+- **Saisie unique « devis / commande »** : un seul bouton « + Nouveau devis / commande » ; en haut du formulaire,
+  choix 📦 Commande (présélectionné depuis `/commandes/nouvelle` et le tableau de bord) ou 📝 Devis (depuis `/devis/nouveau`).
+  Commande = même saisie + livraison, urgent, « BAT à faire » (décoché par défaut → bat_valide), acompte ; enchaîne
+  `enregistrer_devis` → `creer_commande_depuis_devis` → `modifierCommande` : le devis existe (accepté) mais reste en coulisse.
 - Une commande naît aussi d'un devis envoyé : « ✓ Accepté — créer la commande » (fiche devis) ou « Enregistrer et créer la commande »
   (éditeur → `/devis/:id?commande=1`). `creer_commande_depuis_devis` copie lignes, finitions (→ `instructions`), remise, TVA.
 - Statuts : attente_bat → bat_envoye → bat_valide → en_production → termine → livre (annule à part).

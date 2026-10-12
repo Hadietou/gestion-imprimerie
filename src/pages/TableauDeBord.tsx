@@ -64,10 +64,7 @@ export default function TableauDeBord() {
       {(profil.role === 'gerant' || profil.role === 'accueil') && (
         <div className="actions-rapides">
           <Link to="/commandes/nouvelle" className="bouton bouton-principal action-rapide">
-            + Nouvelle commande
-          </Link>
-          <Link to="/devis/nouveau" className="bouton action-rapide">
-            + Nouveau devis
+            + Nouveau devis / commande
           </Link>
         </div>
       )}

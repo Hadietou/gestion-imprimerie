@@ -430,6 +430,18 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
 .barre-statut { padding-bottom: 1rem; border-bottom: 1px solid var(--bordure); margin-bottom: 1.25rem; }
 
 /* ---------- Devis : éditeur ---------- */
+.choix-type { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.type-saisie {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem;
+  padding: 0.9rem 1rem; min-height: 64px;
+  border: 2px solid var(--bordure); border-radius: 12px; background: var(--surface); color: var(--texte);
+  font: inherit; text-align: left; cursor: pointer;
+}
+.type-saisie strong { font-size: 1.1rem; }
+.type-saisie small { color: var(--texte-doux); line-height: 1.3; }
+.type-icone { font-size: 1.4rem; }
+.type-saisie.selectionne { border-color: var(--primaire); background: var(--primaire-doux); }
+.type-saisie.selectionne strong { color: var(--primaire); }
 .editeur-devis { max-width: 900px; }
 .client-choisi { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem; border: 1px solid var(--primaire); border-radius: var(--rayon); background: var(--primaire-doux); }
 .choix-client { display: flex; flex-direction: column; gap: 0.35rem; }
