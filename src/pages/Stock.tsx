@@ -124,7 +124,7 @@ function ListeStock() {
         <div className="vide">
           <p>
             {actifs.length === 0
-              ? 'Aucun article. Le gérant les ajoute dans Tarifs & catalogue > Papiers, supports & encres.'
+              ? 'Aucun article. Le gérant les ajoute dans Catalogue & matériel > Papiers, supports & encres.'
               : alertesSeules
                 ? 'Aucun article sous son seuil d’alerte.'
                 : 'Aucun article ne correspond.'}

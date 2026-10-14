@@ -12,7 +12,7 @@ import type { CategorieSupport, Finition, Machine, Support, Technique, UniteSupp
 import { useParametres } from '../parametres/ParametresContext'
 import Produits from './Produits'
 
-// Tarifs et catalogue : produits avec leur grille de prix de vente (base des devis),
+// Catalogue & matériel : produits avec leur grille de prix de vente (base des devis),
 // finitions, papiers / supports / encres (stock) et machines (atelier).
 // Écriture réservée au gérant (RLS), lecture pour tous les rôles.
 
@@ -21,7 +21,10 @@ export default function Catalogue() {
 
   return (
     <>
-      <nav className="onglets" aria-label="Catalogue">
+      <p className="texte-doux">
+        Ce que vous vendez (produits, prix, finitions) et ce que vous utilisez pour produire (papiers, encres, machines).
+      </p>
+      <nav className="onglets" aria-label="Catalogue et matériel">
         <NavLink to="/catalogue/produits">Produits & prix</NavLink>
         <NavLink to="/catalogue/finitions">Finitions</NavLink>
         <NavLink to="/catalogue/supports">Papiers, supports & encres</NavLink>

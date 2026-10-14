@@ -288,7 +288,7 @@ export default function FicheDepense({
                   )
                 })}
                 {supportsDuChoix.length === 0 && supports.length > 0 && (
-                  <small className="texte-erreur">Aucun article dans cette catégorie : le gérant les ajoute dans Tarifs & catalogue.</small>
+                  <small className="texte-erreur">Aucun article dans cette catégorie : le gérant les ajoute dans Catalogue & matériel.</small>
                 )}
                 <button type="button" className="bouton bouton-discret" onClick={() => setArticles((ls) => [...ls, ligneArticle()])}>
                   + Autre article sur la même facture
