@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext'
 import { LIBELLES_STATUTS_COMMANDE, enRetard, listerCommandes, totalCommande, type CommandeResume } from '../../lib/commandes'
 import { formaterMontant } from '../../lib/format'
+import OngletsVentes from '../../components/OngletsVentes'
 import { useParametres } from '../../parametres/ParametresContext'
 
 const normaliser = (s: string) =>
@@ -54,6 +55,7 @@ export default function ListeCommandes() {
 
   return (
     <>
+      <OngletsVentes />
       <div className="barre-actions">
         <input
           type="search"

@@ -12,6 +12,10 @@ export interface EntreeMenu {
   libelle: string
   icone: string
   roles: Role[]
+  /** Page accessible mais absente du menu (rattachée à une autre entrée) */
+  horsMenu?: boolean
+  /** Autres chemins qui mettent cette entrée en surbrillance */
+  aussi?: string[]
 }
 
 // Menu principal. Les rôles reprennent les droits de lecture définis par les
@@ -20,8 +24,9 @@ export interface EntreeMenu {
 export const MENU: EntreeMenu[] = [
   { chemin: '/tableau-de-bord', libelle: 'Tableau de bord',   icone: '🏠', roles: ['gerant', 'accueil', 'atelier', 'compta'] },
   { chemin: '/clients',         libelle: 'Clients',           icone: '👥', roles: ['gerant', 'accueil', 'compta'] },
-  { chemin: '/devis',           libelle: 'Devis',             icone: '📝', roles: ['gerant', 'accueil', 'compta'] },
-  { chemin: '/commandes',       libelle: 'Commandes',         icone: '📦', roles: ['gerant', 'accueil', 'atelier', 'compta'] },
+  // Commandes et devis : un seul menu, deux onglets (OngletsVentes)
+  { chemin: '/commandes',       libelle: 'Commandes & devis', icone: '📦', roles: ['gerant', 'accueil', 'atelier', 'compta'], aussi: ['/devis'] },
+  { chemin: '/devis',           libelle: 'Commandes & devis', icone: '📝', roles: ['gerant', 'accueil', 'compta'], horsMenu: true },
   { chemin: '/production',      libelle: 'Production',        icone: '🖨️', roles: ['gerant', 'accueil', 'atelier'] },
   { chemin: '/factures',        libelle: 'Factures',          icone: '🧾', roles: ['gerant', 'accueil', 'compta'] },
   { chemin: '/impayes',         libelle: 'Impayés',           icone: '⏰', roles: ['gerant', 'accueil', 'compta'] },
@@ -42,5 +47,8 @@ export const PAGE_ACCUEIL: Record<Role, string> = {
 }
 
 export function menuPourRole(role: Role): EntreeMenu[] {
-  return MENU.filter((e) => e.roles.includes(role))
+  return MENU.filter((e) => e.roles.includes(role) && !e.horsMenu).map((e) =>
+    // L'atelier ne voit pas les devis
+    role === 'atelier' && e.chemin === '/commandes' ? { ...e, libelle: 'Commandes' } : e,
+  )
 }

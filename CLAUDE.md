@@ -179,6 +179,8 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 
 ## Commandes, BAT, production
 
+- Menu unique « Commandes & devis » (/commandes) ; /devis reste une route (entrée `horsMenu` dans roles.ts) atteinte par les onglets `OngletsVentes` en haut des deux listes. L'atelier voit seulement « Commandes ».
+
 - **Saisie unique « devis / commande »** : un seul bouton « + Nouveau devis / commande » ; en haut du formulaire,
   choix 📦 Commande (présélectionné depuis `/commandes/nouvelle` et le tableau de bord) ou 📝 Devis (depuis `/devis/nouveau`).
   Commande = même saisie + livraison, urgent, « BAT à faire » (décoché par défaut → bat_valide), acompte ; enchaîne

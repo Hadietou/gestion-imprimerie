@@ -17,7 +17,7 @@ export default function AppLayout() {
   const titre =
     location.pathname === '/mon-compte'
       ? 'Mon compte'
-      : (MENU.find((e) => location.pathname.startsWith(e.chemin))?.libelle ?? '')
+      : ((entrees.find((e) => location.pathname.startsWith(e.chemin)) ?? MENU.find((e) => location.pathname.startsWith(e.chemin)))?.libelle ?? '')
 
   return (
     <div className={`app ${menuOuvert ? 'menu-ouvert' : ''}`}>
@@ -28,7 +28,14 @@ export default function AppLayout() {
         </div>
         <nav>
           {entrees.map((e) => (
-            <NavLink key={e.chemin} to={e.chemin} className="lien-menu" onClick={() => setMenuOuvert(false)}>
+            <NavLink
+              key={e.chemin}
+              to={e.chemin}
+              className={({ isActive }) =>
+                `lien-menu ${isActive || e.aussi?.some((c) => location.pathname.startsWith(c)) ? 'active' : ''}`
+              }
+              onClick={() => setMenuOuvert(false)}
+            >
               <span aria-hidden="true">{e.icone}</span>
               {e.libelle}
             </NavLink>
