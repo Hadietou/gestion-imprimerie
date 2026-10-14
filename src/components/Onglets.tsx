@@ -40,6 +40,31 @@ export function OngletsVentes() {
   )
 }
 
+export function OngletsStock() {
+  return (
+    <Onglets
+      titre="Stock et fournitures"
+      onglets={[
+        { chemin: '/stock', libelle: '📚 Stock' },
+        { chemin: '/catalogue', libelle: '🏷️ Produits & fournitures', roles: ['gerant'] },
+      ]}
+    />
+  )
+}
+
+export function OngletsAdministration() {
+  return (
+    <Onglets
+      titre="Administration"
+      onglets={[
+        { chemin: '/parametres', libelle: '🛠️ Paramètres', roles: ['gerant'] },
+        { chemin: '/utilisateurs', libelle: '🔑 Utilisateurs', roles: ['gerant'] },
+        { chemin: '/exports', libelle: '📊 Sauvegarde & Excel' },
+      ]}
+    />
+  )
+}
+
 export function OngletsFactures() {
   return (
     <Onglets

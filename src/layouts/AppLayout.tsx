@@ -17,7 +17,8 @@ export default function AppLayout() {
   const titre =
     location.pathname === '/mon-compte'
       ? 'Mon compte'
-      : ((entrees.find((e) => location.pathname.startsWith(e.chemin)) ?? MENU.find((e) => location.pathname.startsWith(e.chemin)))?.libelle ?? '')
+      : ((entrees.find((e) => [e.chemin, ...(e.aussi ?? [])].some((c) => location.pathname.startsWith(c))) ??
+          MENU.find((e) => location.pathname.startsWith(e.chemin)))?.libelle ?? '')
 
   return (
     <div className={`app ${menuOuvert ? 'menu-ouvert' : ''}`}>

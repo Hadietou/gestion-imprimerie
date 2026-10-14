@@ -32,11 +32,15 @@ export const MENU: EntreeMenu[] = [
   { chemin: '/factures',        libelle: 'Factures & impayés', icone: '🧾', roles: ['gerant', 'accueil', 'compta'], aussi: ['/impayes'] },
   { chemin: '/impayes',         libelle: 'Factures & impayés', icone: '⏰', roles: ['gerant', 'accueil', 'compta'], horsMenu: true },
   { chemin: '/depenses',        libelle: 'Dépenses',          icone: '💸', roles: ['gerant', 'compta'] },
-  { chemin: '/stock',           libelle: 'Stock',             icone: '📚', roles: ['gerant', 'accueil', 'atelier', 'compta'] },
-  { chemin: '/exports',         libelle: 'Exports Excel',     icone: '📊', roles: ['gerant', 'compta'] },
-  { chemin: '/catalogue',       libelle: 'Produits & fournitures', icone: '🏷️', roles: ['gerant'] },
-  { chemin: '/utilisateurs',    libelle: 'Utilisateurs',      icone: '🔑', roles: ['gerant'] },
-  { chemin: '/parametres',      libelle: 'Paramètres',        icone: '🛠️', roles: ['gerant'] },
+  // Stock et fournitures : un seul menu, deux onglets (OngletsStock)
+  { chemin: '/stock',           libelle: 'Stock & fournitures', icone: '📚', roles: ['gerant', 'accueil', 'atelier', 'compta'], aussi: ['/catalogue'] },
+  { chemin: '/catalogue',       libelle: 'Stock & fournitures', icone: '🏷️', roles: ['gerant'], horsMenu: true },
+  // Administration : paramètres, utilisateurs, exports (OngletsAdministration).
+  // /administration renvoie vers le premier onglet permis au rôle.
+  { chemin: '/administration',  libelle: 'Administration',    icone: '🛠️', roles: ['gerant', 'compta'], aussi: ['/parametres', '/utilisateurs', '/exports'] },
+  { chemin: '/parametres',      libelle: 'Administration',    icone: '🛠️', roles: ['gerant'], horsMenu: true },
+  { chemin: '/utilisateurs',    libelle: 'Administration',    icone: '🔑', roles: ['gerant'], horsMenu: true },
+  { chemin: '/exports',         libelle: 'Administration',    icone: '📊', roles: ['gerant', 'compta'], horsMenu: true },
 ]
 
 // Page d'arrivée après connexion, selon le métier
@@ -50,6 +54,12 @@ export const PAGE_ACCUEIL: Record<Role, string> = {
 export function menuPourRole(role: Role): EntreeMenu[] {
   return MENU.filter((e) => e.roles.includes(role) && !e.horsMenu).map((e) =>
     // L'atelier ne voit pas les devis
-    role === 'atelier' && e.chemin === '/commandes' ? { ...e, libelle: 'Commandes' } : e,
+    role === 'atelier' && e.chemin === '/commandes'
+      ? { ...e, libelle: 'Commandes' }
+      : role !== 'gerant' && e.chemin === '/stock'
+        ? { ...e, libelle: 'Stock' } // les fournitures (catalogue) sont réservées au gérant
+        : role === 'compta' && e.chemin === '/administration'
+          ? { ...e, libelle: 'Sauvegarde & Excel', icone: '📊' } // seul onglet permis à la compta
+          : e,
   )
 }

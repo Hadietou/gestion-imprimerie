@@ -23,22 +23,55 @@ import Factures from './pages/factures/Factures'
 import Impayes from './pages/Impayes'
 import Exports from './pages/Exports'
 import { ParametresProvider } from './parametres/ParametresProvider'
+import { OngletsAdministration, OngletsStock } from './components/Onglets'
 
 // Pages réelles par chemin ; les autres entrées du MENU affichent « en construction »
 const PAGES: Record<string, ReactNode> = {
   '/tableau-de-bord': <TableauDeBord />,
-  '/utilisateurs': <Utilisateurs />,
-  '/parametres': <Parametres />,
-  '/catalogue': <Catalogue />,
+  '/administration': <RedirectionAdministration />,
+  '/utilisateurs': (
+    <>
+      <OngletsAdministration />
+      <Utilisateurs />
+    </>
+  ),
+  '/parametres': (
+    <>
+      <OngletsAdministration />
+      <Parametres />
+    </>
+  ),
+  '/catalogue': (
+    <>
+      <OngletsStock />
+      <Catalogue />
+    </>
+  ),
   '/clients': <Clients />,
   '/devis': <Devis />,
   '/depenses': <Depenses />,
-  '/stock': <Stock />,
+  '/stock': (
+    <>
+      <OngletsStock />
+      <Stock />
+    </>
+  ),
   '/commandes': <Commandes />,
   '/production': <Production />,
   '/factures': <Factures />,
   '/impayes': <Impayes />,
-  '/exports': <Exports />,
+  '/exports': (
+    <>
+      <OngletsAdministration />
+      <Exports />
+    </>
+  ),
+}
+
+// Menu « Administration » : premier onglet permis au rôle
+function RedirectionAdministration() {
+  const { profil } = useAuth()
+  return <Navigate to={profil?.role === 'gerant' ? '/parametres' : '/exports'} replace />
 }
 
 function RedirectionAccueil() {
