@@ -65,7 +65,7 @@ Les droits du menu **reprennent les droits de lecture RLS** ; si on modifie les 
 | Factures, Impayés | ✓ | ✓ (lecture) |   | ✓ |
 | Dépenses, Exports Excel | ✓ |   |   | ✓ |
 | Stock             | ✓ | ✓ | ✓ | ✓ |
-| Catalogue & matériel, Utilisateurs, Paramètres | ✓ | | | |
+| Produits & fournitures, Utilisateurs, Paramètres | ✓ | | | |
 
 Pages d'arrivée : gérant → `/tableau-de-bord`, accueil → `/commandes`, atelier → `/production`, compta → `/factures`.
 
@@ -172,7 +172,7 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 
 ## Stock
 
-- Articles = table `supports` (papiers, bâches, textiles, encres, consommables), créés par le gérant dans Catalogue & matériel.
+- Articles = table `supports` (papiers, bâches, textiles, encres, consommables), créés par le gérant dans Produits & fournitures.
 - Toute variation = un mouvement `mouvements_stock` (jamais modifié ni supprimé) ; le déclencheur met à jour `stock_actuel`.
   Entrée par achat : module Dépenses. Inventaire : on saisit la quantité comptée, l'écart est enregistré en `ajustement` signé.
 - Valeur du stock (stock × dernier prix d'achat) visible du gérant et de la compta seulement.
