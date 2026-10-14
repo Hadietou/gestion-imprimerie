@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LIBELLES_STATUTS_FACTURE, listerFactures, resteAPayer, type FactureResume } from '../../lib/factures'
 import { formaterMontant } from '../../lib/format'
+import { OngletsFactures } from '../../components/Onglets'
 import { useParametres } from '../../parametres/ParametresContext'
 
 const normaliser = (s: string) =>
@@ -43,6 +44,7 @@ export default function ListeFactures() {
 
   return (
     <>
+      <OngletsFactures />
       <div className="barre-actions">
         <input
           type="search"

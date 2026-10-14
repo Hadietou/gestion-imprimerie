@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listerImpayes, type Impaye } from '../lib/factures'
 import { formaterMontant } from '../lib/format'
+import { OngletsFactures } from '../components/Onglets'
 import { useParametres } from '../parametres/ParametresContext'
 
 // Factures émises non soldées (vue v_impayes), les plus en retard d'abord.
@@ -31,6 +32,7 @@ export default function Impayes() {
 
   return (
     <>
+      <OngletsFactures />
       <section className="carte resume-mois">
         <div className="resume-stock">
           <div>

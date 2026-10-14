@@ -24,12 +24,13 @@ export interface EntreeMenu {
 export const MENU: EntreeMenu[] = [
   { chemin: '/tableau-de-bord', libelle: 'Tableau de bord',   icone: '🏠', roles: ['gerant', 'accueil', 'atelier', 'compta'] },
   { chemin: '/clients',         libelle: 'Clients',           icone: '👥', roles: ['gerant', 'accueil', 'compta'] },
-  // Commandes et devis : un seul menu, deux onglets (OngletsVentes)
+  // Commandes et devis : un seul menu, deux onglets (OngletsVentes, components/Onglets.tsx)
   { chemin: '/commandes',       libelle: 'Commandes & devis', icone: '📦', roles: ['gerant', 'accueil', 'atelier', 'compta'], aussi: ['/devis'] },
   { chemin: '/devis',           libelle: 'Commandes & devis', icone: '📝', roles: ['gerant', 'accueil', 'compta'], horsMenu: true },
   { chemin: '/production',      libelle: 'Production',        icone: '🖨️', roles: ['gerant', 'accueil', 'atelier'] },
-  { chemin: '/factures',        libelle: 'Factures',          icone: '🧾', roles: ['gerant', 'accueil', 'compta'] },
-  { chemin: '/impayes',         libelle: 'Impayés',           icone: '⏰', roles: ['gerant', 'accueil', 'compta'] },
+  // Factures et impayés : un seul menu, deux onglets (OngletsFactures)
+  { chemin: '/factures',        libelle: 'Factures & impayés', icone: '🧾', roles: ['gerant', 'accueil', 'compta'], aussi: ['/impayes'] },
+  { chemin: '/impayes',         libelle: 'Factures & impayés', icone: '⏰', roles: ['gerant', 'accueil', 'compta'], horsMenu: true },
   { chemin: '/depenses',        libelle: 'Dépenses',          icone: '💸', roles: ['gerant', 'compta'] },
   { chemin: '/stock',           libelle: 'Stock',             icone: '📚', roles: ['gerant', 'accueil', 'atelier', 'compta'] },
   { chemin: '/exports',         libelle: 'Exports Excel',     icone: '📊', roles: ['gerant', 'compta'] },
