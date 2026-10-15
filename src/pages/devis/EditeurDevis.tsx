@@ -144,7 +144,7 @@ function Formulaire({
   const remisePct = Math.min(Math.max(versNombre(remise) || 0, 0), 100)
   const tauxTva = tvaActive ? Math.max(versNombre(taux) || 0, 0) : 0
   const totaux = calculerTotaux(lignes.map(totalLigne), remisePct, tauxTva)
-  // Objet du devis : résumé automatique des produits saisis
+  // Objet du devis : résumé automatique des produits saisis (non affiché, enregistré tel quel)
   const objetAuto = resumerObjet(lignes)
 
   function choisirClient(c: Client | null) {
@@ -258,24 +258,6 @@ function Formulaire({
             </span>
             <ChoixClient clients={clients} client={client} onChange={choisirClient} erreur={erreurs.client} />
           </div>
-          <div className="champ-large champ-personnalise">
-            <span className="libelle-champ">Objet (résumé automatique des produits)</span>
-            <p className={`objet-auto ${objetAuto ? '' : 'texte-doux'}`}>
-              {objetAuto || 'Se remplit tout seul avec les produits ajoutés ci-dessous.'}
-            </p>
-          </div>
-          <label htmlFor="date">
-            <span>{modeCommande ? 'Date de la commande' : 'Date du devis'}</span>
-            <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </label>
-          <label htmlFor="validite" hidden={modeCommande}>
-            <span>Validité</span>
-            <span className="champ-suffixe">
-              <input id="validite" inputMode="numeric" value={validite} aria-invalid={erreurs.validite ? true : undefined} onChange={(e) => setValidite(e.target.value)} />
-              <span>jours</span>
-            </span>
-            {erreurs.validite && <small className="texte-erreur">{erreurs.validite}</small>}
-          </label>
         </div>
       </section>
 
@@ -364,6 +346,18 @@ function Formulaire({
           <label className="champ-large" htmlFor="notes">
             <span>{modeCommande ? 'Remarques (consignes, conditions…)' : 'Remarques (imprimées sur le devis)'}</span>
             <textarea id="notes" rows={2} placeholder="Ex. Délai : 5 jours ouvrés après validation du BAT." value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </label>
+          <label htmlFor="date">
+            <span>{modeCommande ? 'Date de la commande' : 'Date du devis'}</span>
+            <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          </label>
+          <label htmlFor="validite" hidden={modeCommande}>
+            <span>Validité</span>
+            <span className="champ-suffixe">
+              <input id="validite" inputMode="numeric" value={validite} aria-invalid={erreurs.validite ? true : undefined} onChange={(e) => setValidite(e.target.value)} />
+              <span>jours</span>
+            </span>
+            {erreurs.validite && <small className="texte-erreur">{erreurs.validite}</small>}
           </label>
         </div>
 

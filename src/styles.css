@@ -506,7 +506,6 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, .bouton:focus
   line-height: 1;
 }
 .ajout-ligne:hover .ajout-ligne-plus { background: var(--primaire-texte); color: var(--primaire); }
-.objet-auto { margin: 0; padding: 0.6rem 0.75rem; border-radius: var(--rayon); background: var(--fond); border: 1px solid var(--bordure); font-weight: 500; }
 
 .totaux { display: grid; grid-template-columns: 1fr auto; gap: 0.35rem 1.5rem; margin: 1.25rem 0 0 auto; max-width: 360px; }
 .totaux dt { color: var(--texte-doux); }
