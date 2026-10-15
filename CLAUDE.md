@@ -179,6 +179,8 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
 
 ## Commandes, BAT, production
 
+- Saisie « Commande » (EditeurDevis, choix Commande) : devis accepté en coulisse → commande → BAT/acompte → **facture créée aussitôt** si « Créer la facture maintenant » est coché (par défaut, choix du gérant : commande directe = facture). Décoché : bouton « Créer la facture » sur la fiche commande.
+
 - Menu unique « Commandes & devis » (/commandes) ; /devis reste une route (entrée `horsMenu` dans roles.ts) atteinte par les onglets `OngletsVentes` en haut des deux listes. L'atelier voit seulement « Commandes ».
 - Même principe pour « Factures & impayés » (/factures, /impayes horsMenu, `OngletsFactures`). Objectif du gérant : le moins de menus possible.
 - « Stock & fournitures » (/stock + /catalogue, `OngletsStock`) et « Administration » (/administration redirige : gérant → /parametres, compta → /exports ; onglets Paramètres, Utilisateurs, Sauvegarde & Excel). Onglets ajoutés autour des pages dans `PAGES` (App.tsx).

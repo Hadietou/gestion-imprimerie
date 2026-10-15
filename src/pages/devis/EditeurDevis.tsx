@@ -9,6 +9,7 @@ import {
   type DevisComplet,
 } from '../../lib/devis'
 import { creerCommandeDepuisDevis, modifierCommande } from '../../lib/commandes'
+import { creerFactureDepuisCommande } from '../../lib/factures'
 import { formaterMontant } from '../../lib/format'
 import type { Client, Finition, Produit } from '../../lib/types'
 import { useParametres } from '../../parametres/ParametresContext'
@@ -135,6 +136,8 @@ function Formulaire({
   const [livraison, setLivraison] = useState('')
   const [urgent, setUrgent] = useState(false)
   const [batNecessaire, setBatNecessaire] = useState(false)
+  // Commande directe = facture tout de suite (choix du gérant) ; décocher pour facturer plus tard
+  const [facturerMaintenant, setFacturerMaintenant] = useState(true)
   const [acompte, setAcompte] = useState('')
 
   if (profil && !['gerant', 'accueil'].includes(profil.role)) {
@@ -201,6 +204,17 @@ function Formulaire({
         if (!batNecessaire) complements.statut = 'bat_valide'
         if (montantAcompte > 0) complements.acompte = montantAcompte
         if (Object.keys(complements).length > 0) await modifierCommande(idCommande, complements)
+        if (facturerMaintenant) {
+          // Après l'acompte : il devient le premier paiement de la facture
+          try {
+            const idFacture = await creerFactureDepuisCommande(idCommande)
+            navigate(`/factures/${idFacture}`)
+            return
+          } catch (err) {
+            alert(`Commande enregistrée, mais la facture n'a pas pu être créée : ${(err as Error).message}
+Utilisez « Créer la facture » sur la commande.`)
+          }
+        }
         navigate(`/commandes/${idCommande}`)
         return
       }
@@ -293,7 +307,7 @@ function Formulaire({
 
       {modeCommande && (
         <section className="carte">
-          <h2 className="titre-carte">Livraison et acompte</h2>
+          <h2 className="titre-carte">Livraison, acompte et facture</h2>
           <div className="grille-champs">
             <label htmlFor="livraison">
               <span>Livraison prévue le</span>
@@ -316,6 +330,15 @@ function Formulaire({
               BAT à faire valider par le client avant la production
             </label>
             {!batNecessaire && <small className="texte-doux champ-large">Sans BAT : la commande part directement dans la file de production.</small>}
+            <label className="case-a-cocher champ-large">
+              <input type="checkbox" checked={facturerMaintenant} onChange={(e) => setFacturerMaintenant(e.target.checked)} />
+              🧾 Créer la facture maintenant
+            </label>
+            <small className="texte-doux champ-large">
+              {facturerMaintenant
+                ? 'La facture est créée avec la commande ; l’acompte y est enregistré comme premier paiement.'
+                : 'Facture à faire plus tard avec le bouton « Créer la facture » de la commande.'}
+            </small>
           </div>
         </section>
       )}
@@ -351,14 +374,17 @@ function Formulaire({
             <span>{modeCommande ? 'Date de la commande' : 'Date du devis'}</span>
             <input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
-          <label htmlFor="validite" hidden={modeCommande}>
-            <span>Validité</span>
-            <span className="champ-suffixe">
-              <input id="validite" inputMode="numeric" value={validite} aria-invalid={erreurs.validite ? true : undefined} onChange={(e) => setValidite(e.target.value)} />
-              <span>jours</span>
-            </span>
-            {erreurs.validite && <small className="texte-erreur">{erreurs.validite}</small>}
-          </label>
+          {/* Pas de validité pour une commande (le devis en coulisse garde la valeur par défaut) */}
+          {!modeCommande && (
+            <label htmlFor="validite">
+              <span>Validité</span>
+              <span className="champ-suffixe">
+                <input id="validite" inputMode="numeric" value={validite} aria-invalid={erreurs.validite ? true : undefined} onChange={(e) => setValidite(e.target.value)} />
+                <span>jours</span>
+              </span>
+              {erreurs.validite && <small className="texte-erreur">{erreurs.validite}</small>}
+            </label>
+          )}
         </div>
 
         <dl className="totaux">
@@ -395,7 +421,7 @@ function Formulaire({
         </button>
         {modeCommande ? (
           <button type="submit" className="bouton bouton-principal" disabled={envoi}>
-            {envoi ? 'Enregistrement…' : 'Enregistrer la commande'}
+            {envoi ? 'Enregistrement…' : facturerMaintenant ? 'Enregistrer la commande et la facture' : 'Enregistrer la commande'}
           </button>
         ) : (
           <button type="submit" className="bouton bouton-principal" disabled={envoi}>
