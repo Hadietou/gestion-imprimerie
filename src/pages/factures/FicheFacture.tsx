@@ -20,8 +20,9 @@ import DocumentFacture from './DocumentFacture'
 
 // Fiche d'une facture : document imprimable, paiements, annulation.
 
-// La facture s'imprime toujours sur une page A4 entière (le devis, lui, sur une demi-page)
-const IMPRESSION = 'A4' as const
+type Impression = 'demi' | 'A4'
+const HAUTEUR_DEMI_PAGE_MM = 148.5
+const PX_PAR_MM = 96 / 25.4
 const dateCourte = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('fr-FR')
 
 export default function FicheFacture() {
@@ -32,6 +33,8 @@ export default function FicheFacture() {
   const [erreur, setErreur] = useState<string | null>(null)
   const [version, setVersion] = useState(0)
   const [paiement, setPaiement] = useState(false)
+  const [impression, setImpression] = useState<Impression>('demi')
+  const [depasse, setDepasse] = useState(false)
   const zoneDocument = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -53,6 +56,14 @@ export default function FicheFacture() {
       document.title = titre
     }
   }, [facture])
+
+  useEffect(() => {
+    const doc = zoneDocument.current?.querySelector<HTMLElement>('.document')
+    if (!doc || impression === 'A4') return
+    const observateur = new ResizeObserver(() => setDepasse(doc.scrollHeight / PX_PAR_MM > HAUTEUR_DEMI_PAGE_MM + 0.5))
+    observateur.observe(doc)
+    return () => observateur.disconnect()
+  }, [impression, facture])
 
   if (erreur && !facture) return <p className="alerte alerte-erreur" role="alert">{erreur}</p>
   if (!facture || !parametres) return <p className="texte-doux">Chargement…</p>
@@ -79,7 +90,7 @@ export default function FicheFacture() {
     .join('\n')
   const proprietesEnvoi = {
     zone: zoneDocument,
-    format: IMPRESSION,
+    format: impression,
     numero: f.numero,
     client: f.client.nom,
     telephone: f.client.telephone,
@@ -120,6 +131,18 @@ export default function FicheFacture() {
           </Link>
         )}
         <span className="espace" />
+        <div className="pastilles filtres choix-format" role="group" aria-label="Format d’impression">
+          {(
+            [
+              ['demi', 'Demi-page A4'],
+              ['A4', 'Page entière'],
+            ] as const
+          ).map(([valeur, libelle]) => (
+            <button key={valeur} type="button" className={`pastille ${impression === valeur ? 'selectionne' : ''}`} aria-pressed={impression === valeur} onClick={() => setImpression(valeur)}>
+              {libelle}
+            </button>
+          ))}
+        </div>
         {estApplicationNative() ? (
           <BoutonEnvoyer {...proprietesEnvoi} impression />
         ) : (
@@ -172,9 +195,14 @@ export default function FicheFacture() {
       </section>
 
       {erreur && <p className="alerte alerte-erreur no-print" role="alert">{erreur}</p>}
+      {impression !== 'A4' && depasse && (
+        <p className="alerte alerte-attention no-print" role="status">
+          Cette facture dépasse la demi-page : choisissez « Page entière » pour l’imprimer.
+        </p>
+      )}
 
-      <div ref={zoneDocument} className={`feuille feuille-${IMPRESSION}`}>
-        <DocumentFacture facture={f} parametres={parametres} format={IMPRESSION} />
+      <div ref={zoneDocument} className={`feuille feuille-${impression}`}>
+        <DocumentFacture facture={f} parametres={parametres} format={impression} />
       </div>
 
       {peutAnnuler && (

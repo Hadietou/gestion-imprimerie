@@ -4,8 +4,8 @@ import { formaterMontant } from '../../lib/format'
 import { montantEnLettres } from '../../lib/lettres'
 import type { Parametres } from '../../lib/parametres'
 
-// Facture mise en page pour l'impression (mêmes styles que le devis) :
-// page A4 entière par défaut ; le format demi-page reste disponible.
+// Facture mise en page pour l'impression (mêmes styles que le devis :
+// moitié haute d'une feuille A4 par défaut, ou page entière).
 
 const date = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
 const dateCourte = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('fr-FR')
@@ -27,7 +27,7 @@ function Lignes({ texte }: { texte: string | null | undefined }) {
 export default function DocumentFacture({
   facture: f,
   parametres: p,
-  format = 'A4',
+  format = 'demi',
 }: {
   facture: Facture
   parametres: Parametres
