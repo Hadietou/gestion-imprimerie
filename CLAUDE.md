@@ -110,7 +110,7 @@ src/
   pages/Stock.tsx       liste (alertes, valeur), fiche article (historique, sortie, entrée, inventaire)
   pages/Depenses.tsx    mois par mois, totaux par catégorie, catégories (gérant) ; FicheDepense.tsx : saisie
   pages/commandes/      Commandes (routes), ListeCommandes, FicheCommande (étapes, BAT, travaux, montants, livraison)
-  pages/factures/       Factures (routes), ListeFactures, FicheFacture (paiements), DocumentFacture (A4 / demi-page)
+  pages/factures/       Factures (routes), ListeFactures, FicheFacture (paiements), DocumentFacture (page A4 entière)
   pages/Exports.tsx     période + dossier comptable, exports par module, sauvegarde complète (gérant, compta)
   pages/Impayes.tsx     factures non soldées, retard, appel du client
   pages/Production.tsx  file de l'atelier (Démarrer / Terminé / Bloqué, machine)
@@ -203,7 +203,7 @@ Ajouter un module : créer la page dans `src/pages/`, l'enregistrer dans `PAGES`
   `notes` = objet. Créée directement « À payer » (`emise`). Annulation : gérant et compta ; refacturation possible ensuite.
 - `montant_paye` et statut (À payer → Payée en partie → Payée) suivent la table `paiements` (déclencheur du schéma).
   Suppression d'un paiement : gérant. L'acompte de la commande est enregistré en paiement « Acompte versé à la commande … ».
-- Impression comme le devis (demi-page A4 par défaut) : déjà réglé, reste à payer, « Arrêtée la présente facture… ».
+- Impression sur une page A4 entière (choix du gérant ; le devis reste en demi-page) : déjà réglé, reste à payer, « Arrêtée la présente facture… ».
 
 ## Tableau de bord et graphiques
 
